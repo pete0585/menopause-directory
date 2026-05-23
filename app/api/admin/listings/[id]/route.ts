@@ -4,8 +4,9 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -39,7 +40,7 @@ export async function PATCH(
   const { error } = await service
     .from('menopause_listings')
     .update(updates)
-    .eq('id', params.id)
+    .eq('id', id)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

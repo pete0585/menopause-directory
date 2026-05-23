@@ -63,7 +63,7 @@ export default function ListingCard({ listing, featured = false }: ListingCardPr
                 )}
               </div>
               {isVerified && (
-                <BadgeCheck className="flex-shrink-0 w-5 h-5 text-brand-plum" title="Verified Provider" />
+                <BadgeCheck className="flex-shrink-0 w-5 h-5 text-brand-plum" aria-label="Verified Provider" />
               )}
             </div>
 

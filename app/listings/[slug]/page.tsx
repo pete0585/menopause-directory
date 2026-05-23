@@ -12,8 +12,8 @@ import { createCheckoutSession } from './actions'
 import type { Listing } from '@/lib/types'
 
 interface PageProps {
-  params: { slug: string }
-  searchParams: { upgraded?: string }
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ upgraded?: string }>
 }
 
 async function getListing(slug: string): Promise<Listing | null> {
@@ -28,7 +28,8 @@ async function getListing(slug: string): Promise<Listing | null> {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const listing = await getListing(params.slug)
+  const { slug } = await params
+  const listing = await getListing(slug)
   if (!listing) return { title: 'Provider Not Found' }
 
   const title = `${listing.full_name}${listing.credentials ? `, ${listing.credentials}` : ''} — Menopause Specialist in ${listing.city}, ${listing.state}`
@@ -49,7 +50,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ListingDetailPage({ params, searchParams }: PageProps) {
-  const listing = await getListing(params.slug)
+  const { slug } = await params
+  const { upgraded } = await searchParams
+  const listing = await getListing(slug)
   if (!listing) notFound()
 
   const isVerified = listing.listing_tier === 'premium' || listing.listing_tier === 'featured'
@@ -108,7 +111,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
           <span className="text-gray-600 truncate">{listing.full_name}</span>
         </nav>
 
-        {searchParams.upgraded && (
+        {upgraded && (
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm mb-6">
             🎉 Your listing has been upgraded to Verified! Your badge and priority placement are now active.
           </div>
@@ -152,7 +155,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       )}
                     </div>
                     {isVerified && (
-                      <BadgeCheck className="w-7 h-7 text-brand-plum flex-shrink-0" title="Verified Provider" />
+                      <BadgeCheck className="w-7 h-7 text-brand-plum flex-shrink-0" aria-label="Verified Provider" />
                     )}
                   </div>
 

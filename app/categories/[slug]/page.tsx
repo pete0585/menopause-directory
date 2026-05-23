@@ -100,7 +100,7 @@ const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
 }
 
 interface PageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 async function getListings(filters: CategoryConfig['filters']): Promise<Listing[]> {
@@ -129,7 +129,8 @@ async function getListings(filters: CategoryConfig['filters']): Promise<Listing[
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const config = CATEGORY_CONFIG[params.slug]
+  const { slug } = await params
+  const config = CATEGORY_CONFIG[slug]
   if (!config) return { title: 'Not Found' }
   return {
     title: config.title,
@@ -142,7 +143,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-  const config = CATEGORY_CONFIG[params.slug]
+  const { slug } = await params
+  const config = CATEGORY_CONFIG[slug]
   if (!config) notFound()
 
   const listings = await getListings(config.filters)

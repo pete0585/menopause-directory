@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.CheckoutSession
+        const session = event.data.object as Stripe.Checkout.Session
         const listingId = session.metadata?.listing_id
         if (!listingId) break
 
@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
         break
       }
 
-      case 'customer.subscription.renewed':
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice
         if (!invoice.subscription) break

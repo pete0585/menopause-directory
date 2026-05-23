@@ -97,7 +97,7 @@ export default function AdminTable({ listings: initial }: AdminTableProps) {
                   <span className="text-sm text-gray-500">{listing.credentials}</span>
                 )}
                 {listing.mscp_certified && (
-                  <BadgeCheck size={16} className="text-brand-plum flex-shrink-0" title="MSCP" />
+                  <BadgeCheck size={16} className="text-brand-plum flex-shrink-0" aria-label="MSCP" />
                 )}
               </div>
               <div className="flex flex-wrap gap-2 mt-1">
