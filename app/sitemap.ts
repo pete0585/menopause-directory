@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   const { data: listings } = await supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('slug, updated_at')
     .eq('is_approved', true)
     .eq('is_active', true)

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
 
         await supabase
-          .from('listings')
+          .from('menopause_listings')
           .update({
             listing_tier: 'premium',
             is_verified: true,
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
           })
           .eq('id', listingId)
 
-        await supabase.from('payments').insert({
+        await supabase.from('menopause_payments').insert({
           listing_id: listingId,
           stripe_payment_intent_id: session.payment_intent as string | null,
           stripe_subscription_id: session.subscription as string,
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         if (!invoice.subscription) break
 
         const { data: listings } = await supabase
-          .from('listings')
+          .from('menopause_listings')
           .select('id')
           .eq('stripe_subscription_id', invoice.subscription)
           .limit(1)
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         if (listings && listings.length > 0) {
           const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           await supabase
-            .from('listings')
+            .from('menopause_listings')
             .update({ subscription_expires_at: expiresAt })
             .eq('stripe_subscription_id', invoice.subscription as string)
         }
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         await supabase
-          .from('listings')
+          .from('menopause_listings')
           .update({
             listing_tier: 'free',
             is_verified: false,

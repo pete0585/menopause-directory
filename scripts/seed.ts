@@ -262,7 +262,7 @@ async function seed() {
     let attempt = 0
     while (true) {
       const { data: existing } = await supabase
-        .from('listings')
+        .from('menopause_listings')
         .select('id')
         .eq('slug', slug)
         .maybeSingle()
@@ -271,7 +271,7 @@ async function seed() {
       slug = `${baseSlug}-${attempt}`
     }
 
-    const { error } = await supabase.from('listings').upsert(
+    const { error } = await supabase.from('menopause_listings').upsert(
       { ...listing, slug },
       { onConflict: 'slug', ignoreDuplicates: false }
     )

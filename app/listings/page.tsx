@@ -35,7 +35,7 @@ export function generateMetadata({ searchParams }: PageProps): Metadata {
 async function getListings(filters: PageProps['searchParams']): Promise<Listing[]> {
   const supabase = createClient()
   let query = supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('*')
     .eq('is_approved', true)
     .eq('is_active', true)

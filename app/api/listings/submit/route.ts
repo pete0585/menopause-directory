@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   let attempt = 0
   while (true) {
     const { data: existing } = await supabase
-      .from('listings')
+      .from('menopause_listings')
       .select('id')
       .eq('slug', slug)
       .maybeSingle()
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     slug = `${baseSlug}-${attempt}`
   }
 
-  const { error } = await supabase.from('listings').insert({
+  const { error } = await supabase.from('menopause_listings').insert({
     slug,
     full_name: data.full_name,
     credentials: data.credentials || null,

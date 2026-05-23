@@ -37,7 +37,7 @@ export async function PATCH(
   )
 
   const { error } = await service
-    .from('listings')
+    .from('menopause_listings')
     .update(updates)
     .eq('id', params.id)
 

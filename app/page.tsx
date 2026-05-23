@@ -54,7 +54,7 @@ const CATEGORIES = [
 async function getFeaturedListings(): Promise<Listing[]> {
   const supabase = createClient()
   const { data } = await supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('*')
     .eq('is_approved', true)
     .eq('is_active', true)
@@ -68,7 +68,7 @@ async function getFeaturedListings(): Promise<Listing[]> {
 async function getRecentListings(): Promise<Listing[]> {
   const supabase = createClient()
   const { data } = await supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('*')
     .eq('is_approved', true)
     .eq('is_active', true)

@@ -19,7 +19,7 @@ interface PageProps {
 async function getListing(slug: string): Promise<Listing | null> {
   const supabase = createClient()
   const { data } = await supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('*')
     .eq('slug', slug)
     .eq('is_active', true)

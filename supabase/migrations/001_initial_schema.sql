@@ -3,7 +3,7 @@
 -- =====================================================================
 
 -- Core listings table
-CREATE TABLE listings (
+CREATE TABLE menopause_listings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   npi_number TEXT UNIQUE,
@@ -57,16 +57,16 @@ CREATE TABLE listings (
 );
 
 -- Indexes
-CREATE INDEX listings_search_idx ON listings USING GIN (search_vector);
-CREATE INDEX listings_city_state_idx ON listings(city, state);
-CREATE INDEX listings_tier_idx ON listings(listing_tier);
-CREATE INDEX listings_type_idx ON listings(practitioner_type);
-CREATE INDEX listings_approved_idx ON listings(is_approved, is_active);
-CREATE INDEX listings_mscp_idx ON listings(mscp_certified) WHERE mscp_certified = TRUE;
-CREATE INDEX listings_telehealth_idx ON listings(accepts_telehealth) WHERE accepts_telehealth = TRUE;
+CREATE INDEX listings_search_idx ON menopause_listings USING GIN (search_vector);
+CREATE INDEX listings_city_state_idx ON menopause_listings(city, state);
+CREATE INDEX listings_tier_idx ON menopause_listings(listing_tier);
+CREATE INDEX listings_type_idx ON menopause_listings(practitioner_type);
+CREATE INDEX listings_approved_idx ON menopause_listings(is_approved, is_active);
+CREATE INDEX listings_mscp_idx ON menopause_listings(mscp_certified) WHERE mscp_certified = TRUE;
+CREATE INDEX listings_telehealth_idx ON menopause_listings(accepts_telehealth) WHERE accepts_telehealth = TRUE;
 
 -- Trigger to maintain search_vector
-CREATE OR REPLACE FUNCTION listings_search_vector_update() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION menopause_listings_search_vector_update() RETURNS TRIGGER AS $$
 BEGIN
   NEW.search_vector :=
     setweight(to_tsvector('english', coalesce(NEW.full_name, '')), 'A') ||
@@ -81,13 +81,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER listings_search_vector_trigger
-  BEFORE INSERT OR UPDATE ON listings
-  FOR EACH ROW EXECUTE FUNCTION listings_search_vector_update();
+  BEFORE INSERT OR UPDATE ON menopause_listings
+  FOR EACH ROW EXECUTE FUNCTION menopause_listings_search_vector_update();
 
 -- Claims table
-CREATE TABLE claims (
+CREATE TABLE menopause_claims (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id UUID REFERENCES listings(id) ON DELETE CASCADE NOT NULL,
+  listing_id UUID REFERENCES menopause_listings(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending','approved','rejected')),
@@ -99,9 +99,9 @@ CREATE TABLE claims (
 );
 
 -- Payments log
-CREATE TABLE payments (
+CREATE TABLE menopause_payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id UUID REFERENCES listings(id) ON DELETE CASCADE NOT NULL,
+  listing_id UUID REFERENCES menopause_listings(id) ON DELETE CASCADE NOT NULL,
   stripe_payment_intent_id TEXT,
   stripe_subscription_id TEXT,
   amount_cents INTEGER NOT NULL,
@@ -114,9 +114,9 @@ CREATE TABLE payments (
 );
 
 -- Reviews (schema now, enable post-launch)
-CREATE TABLE reviews (
+CREATE TABLE menopause_reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  listing_id UUID REFERENCES listings(id) ON DELETE CASCADE NOT NULL,
+  listing_id UUID REFERENCES menopause_listings(id) ON DELETE CASCADE NOT NULL,
   reviewer_name TEXT,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   body TEXT,
@@ -125,7 +125,7 @@ CREATE TABLE reviews (
 );
 
 -- City pages metadata
-CREATE TABLE city_pages (
+CREATE TABLE menopause_city_pages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   city TEXT NOT NULL,
   state TEXT NOT NULL,
@@ -142,47 +142,47 @@ CREATE TABLE city_pages (
 -- Row Level Security
 -- =====================================================================
 
-ALTER TABLE listings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE claims ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE city_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menopause_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menopause_claims ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menopause_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menopause_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menopause_city_pages ENABLE ROW LEVEL SECURITY;
 
 -- Public can read approved listings
-CREATE POLICY "Public read approved listings" ON listings
+CREATE POLICY "Public read approved listings" ON menopause_listings
   FOR SELECT
   USING (is_approved = TRUE AND is_active = TRUE);
 
 -- Service role can do anything (used by API routes and webhooks)
-CREATE POLICY "Service role full access listings" ON listings
+CREATE POLICY "Service role full access listings" ON menopause_listings
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
 -- Authenticated users can read their own claimed listings
-CREATE POLICY "Users can read claimed listings" ON listings
+CREATE POLICY "Users can read claimed listings" ON menopause_listings
   FOR SELECT
   USING (claimed_by = auth.uid());
 
 -- Public can read approved reviews
-CREATE POLICY "Public read approved reviews" ON reviews
+CREATE POLICY "Public read approved reviews" ON menopause_reviews
   FOR SELECT
   USING (is_approved = TRUE);
 
 -- Service role full access for all tables
-CREATE POLICY "Service role full access claims" ON claims
+CREATE POLICY "Service role full access claims" ON menopause_claims
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
-CREATE POLICY "Service role full access payments" ON payments
+CREATE POLICY "Service role full access payments" ON menopause_payments
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
-CREATE POLICY "Service role full access reviews" ON reviews
+CREATE POLICY "Service role full access reviews" ON menopause_reviews
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
 -- Public read city pages
-CREATE POLICY "Public read city_pages" ON city_pages
+CREATE POLICY "Public read city_pages" ON menopause_city_pages
   FOR SELECT
   USING (TRUE);
 

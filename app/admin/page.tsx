@@ -15,10 +15,10 @@ async function getStats(supabase: ReturnType<typeof createClient>) {
     { count: approved },
     { count: premium },
   ] = await Promise.all([
-    supabase.from('listings').select('*', { count: 'exact', head: true }),
-    supabase.from('listings').select('*', { count: 'exact', head: true }).eq('is_active', true).eq('is_approved', false),
-    supabase.from('listings').select('*', { count: 'exact', head: true }).eq('is_approved', true),
-    supabase.from('listings').select('*', { count: 'exact', head: true }).in('listing_tier', ['premium', 'featured']),
+    supabase.from('menopause_listings').select('*', { count: 'exact', head: true }),
+    supabase.from('menopause_listings').select('*', { count: 'exact', head: true }).eq('is_active', true).eq('is_approved', false),
+    supabase.from('menopause_listings').select('*', { count: 'exact', head: true }).eq('is_approved', true),
+    supabase.from('menopause_listings').select('*', { count: 'exact', head: true }).in('listing_tier', ['premium', 'featured']),
   ])
   return { total: total ?? 0, pending: pending ?? 0, approved: approved ?? 0, premium: premium ?? 0 }
 }
@@ -26,7 +26,7 @@ async function getStats(supabase: ReturnType<typeof createClient>) {
 export default async function AdminPage() {
   const supabase = createClient()
   const { data } = await supabase
-    .from('listings')
+    .from('menopause_listings')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100)
