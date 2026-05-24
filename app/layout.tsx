@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Nav from '@/components/Nav'
+import NewsletterFooterBar from '@/components/NewsletterFooterBar'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://menopausedirectory.co'),
@@ -65,6 +66,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-brand-cream">
         <Nav />
         <main>{children}</main>
+        <NewsletterFooterBar />
         <footer className="bg-white border-t border-gray-100 mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid sm:grid-cols-3 gap-8">
