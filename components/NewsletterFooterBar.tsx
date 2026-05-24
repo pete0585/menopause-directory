@@ -12,7 +12,9 @@ export default function NewsletterFooterBar() {
   useEffect(() => {
     const isDismissed = localStorage.getItem(DISMISSED_KEY) === 'true'
     if (!isDismissed) {
-      setDismissed(false)
+      // Small delay so it doesn't flash on first paint
+      const timer = setTimeout(() => setDismissed(false), 1500)
+      return () => clearTimeout(timer)
     }
   }, [])
 
@@ -46,54 +48,57 @@ export default function NewsletterFooterBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 shadow-lg border-t border-[#d4b8d0]"
-      style={{ backgroundColor: '#f5eef8' }}
+      role="complementary"
+      aria-label="Newsletter signup"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-[0_-4px_24px_rgba(92,45,110,0.08)]"
     >
-      <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center gap-4">
-        {/* Dismiss button */}
+      <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+        {/* Dismiss */}
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="absolute top-2 right-3 text-[#9a7a9a] hover:text-[#6a4a6a] text-xl leading-none transition-colors"
+          className="absolute top-2 right-3 text-gray-300 hover:text-gray-500 text-lg leading-none transition-colors"
         >
           ×
         </button>
 
         {/* Copy */}
-        <div className="flex-1 text-center sm:text-left">
-          <p className="text-sm font-semibold text-[#4a2a4a] leading-snug">
-            Weekly menopause guide — real talk about HRT, finding care, and what actually works
+        <div className="flex-1 min-w-0">
+          <p className="font-serif font-semibold text-brand-plum text-sm sm:text-base leading-tight">
+            The weekly menopause guide
           </p>
-          <p className="text-xs text-[#9a7a9a] mt-0.5">No spam. Unsubscribe anytime.</p>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+            Real talk about HRT, finding care, and what actually works.
+          </p>
         </div>
 
         {/* Form or success */}
         {status === 'success' ? (
-          <p className="text-sm font-medium text-[#8a5a8a] whitespace-nowrap">
-            You&apos;re in! Check your inbox.
+          <p className="text-brand-sage font-semibold text-sm shrink-0">
+            You&apos;re in! First email coming soon.
           </p>
         ) : (
-          <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full sm:w-auto">
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email address"
-              className="flex-1 sm:w-56 px-3 py-2 text-sm rounded-md border border-[#d4b8d0] bg-white text-[#4a2a4a] placeholder-[#c4a0c0] focus:outline-none focus:ring-2 focus:ring-[#b87ab8]"
+              placeholder="Your email"
+              disabled={status === 'loading'}
+              className="flex-1 sm:w-52 rounded-full border border-gray-200 bg-brand-cream px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-plum focus:outline-none focus:ring-2 focus:ring-brand-plum/10 disabled:opacity-60"
             />
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="px-4 py-2 text-sm font-semibold rounded-md bg-[#9a5a9a] text-white hover:bg-[#7a3a7a] disabled:opacity-60 transition-colors whitespace-nowrap"
+              className="shrink-0 rounded-full bg-brand-plum px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-plum-dark focus:outline-none focus:ring-2 focus:ring-brand-plum focus:ring-offset-2 disabled:opacity-60"
             >
-              {status === 'loading' ? '…' : 'Send It'}
+              {status === 'loading' ? 'Sending…' : 'Subscribe free'}
             </button>
+            {status === 'error' && (
+              <span className="text-brand-rose text-xs ml-1">Something went wrong. Try again.</span>
+            )}
           </form>
-        )}
-
-        {status === 'error' && (
-          <p className="text-xs text-red-600 mt-1 sm:mt-0">Something went wrong. Try again.</p>
         )}
       </div>
     </div>
