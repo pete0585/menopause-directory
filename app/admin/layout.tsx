@@ -9,8 +9,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/admin/login')
   }
 
-  const isAdmin = user.user_metadata?.is_admin === true
-  if (!isAdmin) {
+  const adminEmail = process.env.ADMIN_EMAIL
+  if (!adminEmail) {
+    console.error('ADMIN_EMAIL env var is not set. Denying all admin access.')
+    redirect('/')
+  }
+  if (user.email !== adminEmail) {
     redirect('/')
   }
 

@@ -101,7 +101,7 @@ export default function ListingCard({ listing, featured = false }: ListingCardPr
           {listing.website && (
             <div className="flex items-center gap-2">
               <Globe size={14} className="flex-shrink-0 text-gray-400" />
-              <span className="text-brand-plum truncate">{listing.website.replace(/^https?:\/\//, '')}</span>
+              <span className="text-brand-plum truncate">{listing.website.replace(/^https?:\/\//, '').split('?')[0].split('#')[0].replace(/\/$/, '')}</span>
             </div>
           )}
         </div>

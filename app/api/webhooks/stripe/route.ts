@@ -34,7 +34,29 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const listingId = session.metadata?.listing_id
-        if (!listingId) break
+        if (!listingId) {
+          console.error('STRIPE WEBHOOK: checkout.session.completed missing listing_id metadata', {
+            sessionId: session.id,
+            amount: session.amount_total,
+            customer: session.customer,
+            metadata: session.metadata,
+          })
+          // Alert admin via email
+          const resendKey = process.env.RESEND_API_KEY
+          if (resendKey) {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                from: 'hello@menopausedirectory.co',
+                to: 'adam@thestrategicveteran.com',
+                subject: '⚠️ MenopauseDirectory: Stripe payment received but listing NOT upgraded',
+                html: `<p>A Stripe checkout completed but <strong>listing_id metadata was missing</strong>. The customer was charged but their listing was NOT upgraded.</p><p><strong>Session ID:</strong> ${session.id}<br/><strong>Amount:</strong> $${(session.amount_total ?? 0) / 100}<br/><strong>Customer:</strong> ${session.customer}</p><p>Manually upgrade this listing via the Stripe dashboard.</p>`,
+              }),
+            }).catch(e => console.error('Failed to send webhook alert email:', e))
+          }
+          break
+        }
 
         const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const RESEND_AUDIENCE_ID = '0fffadeb-d93b-45ff-a6d2-c74504f4089d'
+const RESEND_AUDIENCE_ID = process.env.RESEND_MENOPAUSE_AUDIENCE_ID ?? '0fffadeb-d93b-45ff-a6d2-c74504f4089d'
 
 export async function POST(request: NextRequest) {
   try {
