@@ -32,35 +32,48 @@ export async function POST(request: NextRequest) {
     }
 
     const resendKey = process.env.RESEND_API_KEY
-    if (resendKey) {
-      // Add to Resend audience
-      await fetch(`https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: normalizedEmail, unsubscribed: false }),
-      }).catch((err) => console.error('Resend audience add error:', err))
+    if (!resendKey) {
+      console.error('RESEND_API_KEY is not configured')
+      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
+    }
 
-      // Send welcome email
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'hello@menopausedirectory.co',
-          to: normalizedEmail,
-          subject: 'Welcome to the weekly menopause guide',
-          html: `<p>Hi there,</p>
+    // Add to Resend audience
+    const audienceRes = await fetch(`https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: normalizedEmail, unsubscribed: false }),
+    }).catch((err) => { console.error('Resend audience add error:', err); return null })
+
+    if (!audienceRes || !audienceRes.ok) {
+      console.error('Resend audience add failed', audienceRes?.status)
+      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
+    }
+
+    // Send welcome email
+    const emailRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'hello@menopausedirectory.co',
+        to: normalizedEmail,
+        subject: 'Welcome to the weekly menopause guide',
+        html: `<p>Hi there,</p>
 <p>You're in. Every week: real talk about HRT, finding care, and what actually works for perimenopause and menopause.</p>
 <p>No fluff. No spam. Just the guide you wish you'd had sooner.</p>
 <p>— The MenopauseDirectory.co team</p>
 <p style="font-size:12px;color:#aaa;margin-top:32px;">You signed up at MenopauseDirectory.co. <a href="https://menopausedirectory.co">Visit the directory</a>.</p>`,
-        }),
-      }).catch((err) => console.error('Resend welcome email error:', err))
+      }),
+    }).catch((err) => { console.error('Resend welcome email error:', err); return null })
+
+    if (!emailRes || !emailRes.ok) {
+      console.error('Resend welcome email failed', emailRes?.status)
+      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
