@@ -1,10 +1,16 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity, MapPin, Map } from 'lucide-react'
+import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
+
+interface CityGridItem {
+  slug: string
+  city: string
+  state_abbr: string
+}
 
 const CATEGORIES = [
   {
@@ -51,6 +57,16 @@ const CATEGORIES = [
   },
 ]
 
+async function getTopCities(): Promise<CityGridItem[]> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('menopause_city_pages')
+    .select('slug, city, state_abbr')
+    .order('listing_count', { ascending: false })
+    .limit(12)
+  return (data as CityGridItem[]) ?? []
+}
+
 async function getFeaturedListings(): Promise<Listing[]> {
   const supabase = createClient()
   const { data } = await supabase
@@ -79,7 +95,11 @@ async function getRecentListings(): Promise<Listing[]> {
 }
 
 export default async function HomePage() {
-  const [featured, recent] = await Promise.all([getFeaturedListings(), getRecentListings()])
+  const [featured, recent, topCities] = await Promise.all([
+    getFeaturedListings(),
+    getRecentListings(),
+    getTopCities(),
+  ])
 
   return (
     <div>
@@ -167,33 +187,52 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Browse by location */}
+      {/* Search by City */}
       <section className="bg-brand-cream py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="font-serif text-2xl font-bold text-gray-900">Browse by Location</h2>
-            <p className="mt-1 text-gray-500 text-sm">Find specialists in your city or state.</p>
+            <h2 className="font-serif text-2xl font-bold text-gray-900">Search by City</h2>
+            <p className="mt-1 text-gray-500 text-sm">
+              Menopause specialists serving women across the country.
+            </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+          {/* City grid */}
+          {topCities.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+              {topCities.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/menopause-doctors/${c.slug}`}
+                  className="flex flex-col items-center justify-center gap-0.5 bg-white rounded-2xl border border-gray-100 px-3 py-4 hover:border-brand-plum/30 hover:shadow-sm hover:bg-brand-cream transition-all group"
+                >
+                  <MapPin
+                    size={14}
+                    className="text-brand-rose group-hover:text-brand-plum transition-colors mb-0.5"
+                    aria-hidden="true"
+                  />
+                  <span className="font-semibold text-gray-900 text-sm text-center leading-tight group-hover:text-brand-plum transition-colors">
+                    {c.city}
+                  </span>
+                  <span className="text-xs text-gray-400">{c.state_abbr}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Bottom nav buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/cities"
-              className="flex items-center justify-center gap-3 bg-white rounded-2xl border border-gray-100 px-8 py-5 hover:border-brand-plum/30 hover:shadow-md transition-all group"
+              className="inline-flex items-center justify-center gap-2 border border-brand-plum/30 text-brand-plum font-medium px-6 py-3 rounded-full hover:bg-brand-plum/5 transition-colors text-sm"
             >
-              <MapPin size={22} className="text-brand-rose group-hover:text-brand-plum transition-colors" aria-hidden="true" />
-              <div className="text-left">
-                <p className="font-semibold text-gray-900 group-hover:text-brand-plum transition-colors">Browse by City</p>
-                <p className="text-xs text-gray-400">Find specialists in your city</p>
-              </div>
+              Browse all cities →
             </Link>
             <Link
               href="/states"
-              className="flex items-center justify-center gap-3 bg-white rounded-2xl border border-gray-100 px-8 py-5 hover:border-brand-plum/30 hover:shadow-md transition-all group"
+              className="inline-flex items-center justify-center gap-2 border border-gray-200 text-gray-600 font-medium px-6 py-3 rounded-full hover:border-brand-plum/30 hover:text-brand-plum transition-colors text-sm"
             >
-              <Map size={22} className="text-brand-sage group-hover:text-brand-plum transition-colors" aria-hidden="true" />
-              <div className="text-left">
-                <p className="font-semibold text-gray-900 group-hover:text-brand-plum transition-colors">Browse by State</p>
-                <p className="text-xs text-gray-400">See all specialists in your state</p>
-              </div>
+              Browse by state →
             </Link>
           </div>
         </div>
