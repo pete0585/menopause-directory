@@ -18,6 +18,7 @@ interface PageProps {
     accepts_telehealth?: string
     accepting_new_patients?: string
     hrt_prescriber?: string
+    insurance?: string
     q?: string
   }
 }
@@ -67,6 +68,9 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
   }
   if (filters.hrt_prescriber === 'true') {
     query = query.eq('hrt_prescriber', true)
+  }
+  if (filters.insurance) {
+    query = query.contains('insurance_accepted', [filters.insurance])
   }
   if (filters.q) {
     query = query.textSearch('search_vector', filters.q, { type: 'websearch' })
