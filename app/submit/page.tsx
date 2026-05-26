@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
-import { CheckCircle, BadgeCheck, Star } from 'lucide-react'
+import Link from 'next/link'
+import { CheckCircle, Star, ShieldCheck } from 'lucide-react'
 import SubmitForm from '@/components/SubmitForm'
 
 export const metadata: Metadata = {
-  title: 'List Your Practice — MenopauseDirectory.co',
-  description: 'Add your menopause practice. Free listing available. Verified (149/year) and Featured (299/year) listings get priority placement, verified badge, and full profiles.',
+  title: 'List Your Practice | MenopauseDirectory.co',
+  description:
+    'Add your menopause specialty practice to MenopauseDirectory.co. Free listing available. Verified ($49/year) and Featured ($79/year) listings get full profiles, booking links, and priority placement.',
 }
 
 const PRICING_TIERS = [
@@ -16,76 +18,73 @@ const PRICING_TIERS = [
     features: [
       'Name, credentials, city, state listed',
       'Shown in search results',
-      'Claim link displayed',
-      'Auto-created from public data',
+      'Practitioner type displayed',
+      'Claim link to complete your profile',
     ],
     cta: 'Submit Free Listing',
     highlighted: false,
-    featured: false,
   },
   {
     name: 'Verified',
-    price: '$149',
+    price: '$49',
     period: 'per year',
-    description: 'Priority placement that converts searchers to patients.',
+    description: 'Full profile that converts searchers to patients.',
     features: [
       'Everything in Free',
-      'Priority placement above free listings',
-      'Verified badge — patients trust you more',
-      'Full bio, photo, credentials, specialties',
-      'Direct booking link and contact details',
-      'MSCP, HRT, telehealth filters surface you first',
-      'Higher placement in city and state pages',
+      'Profile photo',
+      'Full bio (up to 500 words)',
+      'Specialties listed',
+      'Insurance accepted',
+      'HRT prescriber badge',
+      'Accepts telehealth badge',
+      'Direct booking link',
+      '"Verified" badge on listing',
+      'Higher search placement',
     ],
     cta: 'Get Verified',
     highlighted: true,
-    featured: false,
   },
   {
     name: 'Featured',
-    price: '$299',
+    price: '$79',
     period: 'per year',
-    description: 'Top of every search. Maximum visibility.',
+    description: 'Maximum trust. Maximum visibility.',
     features: [
       'Everything in Verified',
-      'TOP placement — above all verified and free listings',
-      '1 of only 3 featured spots per city page',
-      'Highlighted card stands out in search results',
-      'Monthly newsletter mention to subscribers',
-      'Priority support and onboarding',
+      'MSCP credential verified',
+      '"Featured Provider" banner',
+      'Priority placement in all searches',
+      'Featured on city and category pages',
     ],
     cta: 'Get Featured',
     highlighted: false,
-    featured: true,
   },
 ]
 
 export default function SubmitPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Hero */}
       <div className="text-center mb-12">
         <h1 className="font-serif text-4xl font-bold text-gray-900">
           List Your Practice on MenopauseDirectory.co
         </h1>
         <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-          Thousands of women are actively searching for a menopause specialist. Free to list. One new patient from a Verified listing pays for the year twice over.
+          The only nationwide directory built for menopause specialists. Free to list.
+          One new patient from a Verified listing pays for the year — four times over.
         </p>
       </div>
 
-      {/* Pricing cards */}
+      {/* Pricing */}
       <div id="pricing" className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-16">
         {PRICING_TIERS.map((tier) => (
           <div
             key={tier.name}
-            className={[
-              'rounded-2xl p-6 flex flex-col relative',
+            className={`rounded-2xl p-6 ${
               tier.highlighted
-                ? 'border-2 border-brand-plum bg-brand-plum/5'
-                : tier.featured
-                ? 'border-2 border-brand-rose bg-brand-rose/5'
-                : 'border border-gray-200 bg-white',
-            ].join(' ')}
+                ? 'border-2 border-brand-plum bg-brand-plum/5 relative'
+                : 'border border-gray-200 bg-white'
+            }`}
           >
             {tier.highlighted && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -94,18 +93,11 @@ export default function SubmitPage() {
                 </span>
               </div>
             )}
-            {tier.featured && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-brand-rose text-white text-xs font-semibold px-3 py-1 rounded-full">
-                  Best Value
-                </span>
-              </div>
-            )}
 
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-1">
-                {tier.name === 'Verified' && <BadgeCheck className="h-4 w-4 text-brand-plum" />}
-                {tier.name === 'Featured' && <Star className="h-4 w-4 text-brand-rose" />}
+                {tier.name === 'Verified' && <Star className="h-4 w-4 text-brand-plum" />}
+                {tier.name === 'Featured' && <ShieldCheck className="h-4 w-4 text-brand-rose" />}
                 <span className="font-semibold text-gray-800">{tier.name}</span>
               </div>
               <div className="flex items-baseline gap-1">
@@ -115,10 +107,10 @@ export default function SubmitPage() {
               <p className="mt-1 text-xs text-gray-500">{tier.description}</p>
             </div>
 
-            <ul className="space-y-2 mb-6 flex-1">
+            <ul className="space-y-2 mb-6">
               {tier.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                  <CheckCircle className="h-4 w-4 text-brand-sage mt-0.5 shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-brand-plum mt-0.5 shrink-0" />
                   {f}
                 </li>
               ))}
@@ -126,14 +118,11 @@ export default function SubmitPage() {
 
             <a
               href="#submit-form"
-              className={[
-                'block w-full text-center rounded-full py-2.5 text-sm font-semibold transition-colors',
+              className={`block w-full text-center rounded-full py-2.5 text-sm font-semibold transition-colors ${
                 tier.highlighted
                   ? 'bg-brand-plum text-white hover:bg-brand-plum-dark'
-                  : tier.featured
-                  ? 'bg-brand-rose text-white hover:opacity-90'
-                  : 'border border-gray-200 text-gray-600 hover:border-brand-plum hover:text-brand-plum',
-              ].join(' ')}
+                  : 'border border-gray-200 text-gray-600 hover:border-brand-plum hover:text-brand-plum'
+              }`}
             >
               {tier.cta}
             </a>
@@ -142,10 +131,12 @@ export default function SubmitPage() {
       </div>
 
       {/* ROI callout */}
-      <div className="rounded-2xl bg-brand-cream border border-brand-plum/10 p-6 mb-12 text-center">
-        <p className="text-sm text-gray-600">
+      <div className="rounded-2xl bg-brand-cream border border-brand-cream-dark p-6 mb-12 text-center">
+        <p className="text-sm text-gray-700">
           <span className="font-semibold text-gray-900">The math is simple:</span>{' '}
-          Menopause specialists charge $200–$500 per initial consultation. One new patient from a Verified listing pays for the year — twice. Women searching here have already decided they need a specialist. They just need to find you.
+          Menopause specialists charge $200–$400 per initial consultation. One new patient from a
+          Verified listing pays for the year — four times over. No other directory puts this many
+          menopause-focused patients in front of you.
         </p>
       </div>
 
@@ -155,7 +146,8 @@ export default function SubmitPage() {
           Submit Your Listing
         </h2>
         <p className="text-sm text-gray-500 mb-8">
-          Start with a free listing. After submission you&apos;ll receive a claim link to upgrade to Verified or Featured and complete your profile.
+          Start with a free listing. After submission you'll receive a claim link to upgrade to
+          Verified or Featured and complete your profile.
         </p>
         <SubmitForm />
       </div>
