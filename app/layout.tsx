@@ -74,7 +74,7 @@ export default function RootLayout({
         <NewsletterFooterBar />
         <footer className="bg-white border-t border-gray-100 mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="grid sm:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               <div>
                 <div className="font-serif font-bold text-xl text-brand-plum mb-3">
                   Menopause<span className="text-brand-rose">Directory</span>
@@ -100,6 +100,12 @@ export default function RootLayout({
                   <li><a href="/submit" className="hover:text-brand-plum transition-colors">List Your Practice</a></li>
                   <li><a href="/listings" className="hover:text-brand-plum transition-colors">Find Your Listing</a></li>
                   <li><a href="/admin" className="hover:text-brand-plum transition-colors">Admin</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">Related Directories</h4>
+                <ul className="space-y-2 text-sm text-gray-500">
+                  <li><a href="https://ibclcdirectory.com" target="_blank" rel="noopener" className="hover:text-brand-plum transition-colors">IBCLC Directory</a></li>
                 </ul>
               </div>
             </div>
