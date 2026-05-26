@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
+import { getListingCount } from '@/lib/data'
 
 interface CityGridItem {
   slug: string
@@ -95,10 +96,11 @@ async function getRecentListings(): Promise<Listing[]> {
 }
 
 export default async function HomePage() {
-  const [featured, recent, topCities] = await Promise.all([
+  const [featured, recent, topCities, listingCount] = await Promise.all([
     getFeaturedListings(),
     getRecentListings(),
     getTopCities(),
+    getListingCount().catch(() => 0),
   ])
 
   return (
@@ -106,6 +108,10 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="bg-hero-gradient py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-brand-plum/8 border border-brand-plum/20 px-4 py-2 text-sm text-brand-plum mb-4">
+            <BadgeCheck className="h-4 w-4" />
+            <span>{listingCount.toLocaleString()} menopause specialists listed</span>
+          </div>
           <p className="text-brand-rose font-medium text-sm uppercase tracking-widest mb-4">
             The Modern Menopause Directory
           </p>
