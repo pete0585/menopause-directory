@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           listing_id: listingId,
           stripe_payment_intent_id: session.payment_intent as string | null,
           stripe_subscription_id: session.subscription as string,
-          amount_cents: session.amount_total ?? 4900,
+          amount_cents: session.amount_total ?? 14900,
           currency: session.currency ?? 'usd',
           tier: 'premium',
           status: 'succeeded',

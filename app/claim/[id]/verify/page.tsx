@@ -129,7 +129,7 @@ export default function ClaimVerifyPage() {
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
         <div className="inline-block bg-brand-plum/10 text-brand-plum text-sm font-semibold px-3 py-1 rounded-full mb-4">
-          Verified Specialist — $49/year
+          Verified Specialist — $149/year
         </div>
         <h2 className="font-serif text-2xl font-bold text-gray-900 mb-2">
           Get found by more patients
@@ -162,7 +162,7 @@ export default function ClaimVerifyPage() {
             <Loader2 size={16} className="animate-spin" />
           ) : (
             <>
-              Upgrade to Verified — $49/year
+              Upgrade to Verified — $149/year
               <ArrowRight size={16} />
             </>
           )}

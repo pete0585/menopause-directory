@@ -5,7 +5,7 @@ import SubmitForm from '@/components/SubmitForm'
 export const metadata: Metadata = {
   title: 'List Your Practice — Add Your Menopause Specialty',
   description:
-    'Add your menopause practice to MenopauseDirectory.co. Free listings available. Verified listings with priority placement start at $49/year.',
+    'Add your menopause practice to MenopauseDirectory.co. Free listings available. Verified listings with priority placement start at $149/year.',
 }
 
 export default function SubmitPage() {
@@ -43,7 +43,7 @@ export default function SubmitPage() {
                     <BadgeCheck size={16} className="text-brand-plum" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 text-sm">Verified — $49/year</p>
+                    <p className="font-medium text-gray-900 text-sm">Verified — $149/year</p>
                     <p className="text-xs text-gray-500 mt-0.5">Priority placement in search results, Verified badge, full profile with bio, photo, and direct booking link.</p>
                   </div>
                 </div>
@@ -58,7 +58,7 @@ export default function SubmitPage() {
                   'The alternative (NAMS portal) is members-only and barely functional',
                   'MSCP credential badge displayed prominently',
                   'HRT prescriber filter sends the right patients directly to you',
-                  '$49/year pays for itself with a single new patient',
+                  '$149/year pays for itself with a single new patient',
                 ].map((point, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                     <Star size={13} className="text-brand-rose flex-shrink-0 mt-0.5" />

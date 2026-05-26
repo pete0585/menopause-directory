@@ -211,7 +211,7 @@ export default async function HomePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Are you a menopause specialist?</h2>
           <p className="text-white/80 text-lg mb-8">
-            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $49/year — and pay for themselves with a single new patient.
+            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $149/year — and pay for themselves with a single new patient.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

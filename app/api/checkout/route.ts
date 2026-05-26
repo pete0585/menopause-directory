@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 
-const VERIFIED_PRICE_CENTS = 4900 // $49/year
+const VERIFIED_PRICE_CENTS = 14900 // $149/year
 
 export async function POST(request: NextRequest) {
   try {

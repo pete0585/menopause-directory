@@ -153,7 +153,7 @@ GET https://api.mapbox.com/geocoding/v5/mapbox.places/{address}.json?access_toke
 |------|-------|---------|
 | Unclaimed | Free | Name, type, location, phone only |
 | Claimed (Free) | Free | + Bio, website, specialties, photo |
-| Verified | $49/year | + Badge, priority placement, booking link |
+| Verified | $149/year | + Badge, priority placement, booking link |
 
 Verified upgrade: practitioners click "Get Verified" on their listing → Stripe Checkout → webhook activates `listing_tier: 'premium'` and `is_verified: true`.
 
