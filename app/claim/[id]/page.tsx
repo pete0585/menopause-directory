@@ -79,7 +79,7 @@ export default function ClaimPage() {
             'Link your website and online booking system',
             'Show your MSCP certification and specialties',
             'Toggle telehealth availability and new patient status',
-            'Upgrade to Verified for priority placement ($99/year)',
+            'Upgrade to Verified for priority placement ($149/year)',
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
               <div className="w-5 h-5 rounded-full bg-brand-sage/15 flex items-center justify-center flex-shrink-0 mt-0.5">

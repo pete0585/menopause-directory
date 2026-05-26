@@ -133,7 +133,7 @@ export default function ClaimVerifyPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
           <div className="mb-4">
             <div className="inline-block bg-brand-plum/10 text-brand-plum text-xs font-semibold px-3 py-1 rounded-full mb-3">
-              Verified — $99/year
+              Verified — $149/year
             </div>
             <h2 className="font-serif text-xl font-bold text-gray-900 mb-1">
               Get found by more patients
@@ -167,7 +167,7 @@ export default function ClaimVerifyPage() {
               <Loader2 size={16} className="animate-spin" />
             ) : (
               <>
-                Upgrade to Verified — $99/year
+                Upgrade to Verified — $149/year
                 <ArrowRight size={16} />
               </>
             )}
@@ -183,7 +183,7 @@ export default function ClaimVerifyPage() {
           </div>
           <div className="mb-4">
             <div className="inline-block bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
-              Featured — $249/year
+              Featured — $299/year
             </div>
             <h2 className="font-serif text-xl font-bold text-white mb-1">
               Top of every search
@@ -216,7 +216,7 @@ export default function ClaimVerifyPage() {
               <Loader2 size={16} className="animate-spin text-brand-plum" />
             ) : (
               <>
-                Get Featured — $249/year
+                Get Featured — $299/year
                 <ArrowRight size={16} />
               </>
             )}
