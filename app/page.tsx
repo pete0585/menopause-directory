@@ -1,17 +1,10 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity, MapPin } from 'lucide-react'
+import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
-import { getListingCount } from '@/lib/data'
-
-interface CityGridItem {
-  slug: string
-  city: string
-  state_abbr: string
-}
 
 const CATEGORIES = [
   {
@@ -58,16 +51,6 @@ const CATEGORIES = [
   },
 ]
 
-async function getTopCities(): Promise<CityGridItem[]> {
-  const supabase = createClient()
-  const { data } = await supabase
-    .from('menopause_city_pages')
-    .select('slug, city, state_abbr')
-    .order('listing_count', { ascending: false })
-    .limit(12)
-  return (data as CityGridItem[]) ?? []
-}
-
 async function getFeaturedListings(): Promise<Listing[]> {
   const supabase = createClient()
   const { data } = await supabase
@@ -96,22 +79,13 @@ async function getRecentListings(): Promise<Listing[]> {
 }
 
 export default async function HomePage() {
-  const [featured, recent, topCities, listingCount] = await Promise.all([
-    getFeaturedListings(),
-    getRecentListings(),
-    getTopCities(),
-    getListingCount().catch(() => 0),
-  ])
+  const [featured, recent] = await Promise.all([getFeaturedListings(), getRecentListings()])
 
   return (
     <div>
       {/* Hero */}
       <section className="bg-hero-gradient py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-brand-plum/8 border border-brand-plum/20 px-4 py-2 text-sm text-brand-plum mb-4">
-            <BadgeCheck className="h-4 w-4" />
-            <span>{listingCount.toLocaleString()} menopause specialists listed</span>
-          </div>
           <p className="text-brand-rose font-medium text-sm uppercase tracking-widest mb-4">
             The Modern Menopause Directory
           </p>
@@ -193,57 +167,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Search by City */}
-      <section className="bg-brand-cream py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="font-serif text-2xl font-bold text-gray-900">Search by City</h2>
-            <p className="mt-1 text-gray-500 text-sm">
-              Menopause specialists serving women across the country.
-            </p>
-          </div>
-
-          {/* City grid */}
-          {topCities.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
-              {topCities.map((c) => (
-                <Link
-                  key={c.slug}
-                  href={`/menopause-doctors/${c.slug}`}
-                  className="flex flex-col items-center justify-center gap-0.5 bg-white rounded-2xl border border-gray-100 px-3 py-4 hover:border-brand-plum/30 hover:shadow-sm hover:bg-brand-cream transition-all group"
-                >
-                  <MapPin
-                    size={14}
-                    className="text-brand-rose group-hover:text-brand-plum transition-colors mb-0.5"
-                    aria-hidden="true"
-                  />
-                  <span className="font-semibold text-gray-900 text-sm text-center leading-tight group-hover:text-brand-plum transition-colors">
-                    {c.city}
-                  </span>
-                  <span className="text-xs text-gray-400">{c.state_abbr}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Bottom nav buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/cities"
-              className="inline-flex items-center justify-center gap-2 border border-brand-plum/30 text-brand-plum font-medium px-6 py-3 rounded-full hover:bg-brand-plum/5 transition-colors text-sm"
-            >
-              Browse all cities →
-            </Link>
-            <Link
-              href="/states"
-              className="inline-flex items-center justify-center gap-2 border border-gray-200 text-gray-600 font-medium px-6 py-3 rounded-full hover:border-brand-plum/30 hover:text-brand-plum transition-colors text-sm"
-            >
-              Browse by state →
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Featured listings */}
       {featured.length > 0 && (
         <section className="bg-white py-16">
@@ -288,7 +211,7 @@ export default async function HomePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Are you a menopause specialist?</h2>
           <p className="text-white/80 text-lg mb-8">
-            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $149/year — and pay for themselves with a single new patient.
+            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $49/year — and pay for themselves with a single new patient.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
