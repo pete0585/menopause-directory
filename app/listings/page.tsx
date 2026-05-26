@@ -19,6 +19,7 @@ interface PageProps {
     accepting_new_patients?: string
     hrt_prescriber?: string
     insurance?: string
+    isswsh_member?: string
     q?: string
   }
 }
@@ -72,6 +73,9 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
   if (filters.insurance) {
     query = query.contains('insurance_accepted', [filters.insurance])
   }
+  if (filters.isswsh_member === 'true') {
+    query = query.eq('isswsh_member', true)
+  }
   if (filters.q) {
     query = query.textSearch('search_vector', filters.q, { type: 'websearch' })
   }
@@ -124,6 +128,7 @@ export default async function ListingsPage({ searchParams }: PageProps) {
   const activeFilters = [
     searchParams.mscp_certified === 'true' && 'MSCP Certified',
     searchParams.hrt_prescriber === 'true' && 'HRT Prescribers',
+    searchParams.isswsh_member === 'true' && 'ISSWSH Member',
     searchParams.accepts_telehealth === 'true' && 'Telehealth',
     searchParams.accepting_new_patients === 'true' && 'Accepting Patients',
   ].filter(Boolean) as string[]
