@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity } from 'lucide-react'
+import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity, MapPin, Map } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
@@ -167,6 +167,38 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Browse by location */}
+      <section className="bg-brand-cream py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="font-serif text-2xl font-bold text-gray-900">Browse by Location</h2>
+            <p className="mt-1 text-gray-500 text-sm">Find specialists in your city or state.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/cities"
+              className="flex items-center justify-center gap-3 bg-white rounded-2xl border border-gray-100 px-8 py-5 hover:border-brand-plum/30 hover:shadow-md transition-all group"
+            >
+              <MapPin size={22} className="text-brand-rose group-hover:text-brand-plum transition-colors" aria-hidden="true" />
+              <div className="text-left">
+                <p className="font-semibold text-gray-900 group-hover:text-brand-plum transition-colors">Browse by City</p>
+                <p className="text-xs text-gray-400">Find specialists in your city</p>
+              </div>
+            </Link>
+            <Link
+              href="/states"
+              className="flex items-center justify-center gap-3 bg-white rounded-2xl border border-gray-100 px-8 py-5 hover:border-brand-plum/30 hover:shadow-md transition-all group"
+            >
+              <Map size={22} className="text-brand-sage group-hover:text-brand-plum transition-colors" aria-hidden="true" />
+              <div className="text-left">
+                <p className="font-semibold text-gray-900 group-hover:text-brand-plum transition-colors">Browse by State</p>
+                <p className="text-xs text-gray-400">See all specialists in your state</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Featured listings */}
       {featured.length > 0 && (
         <section className="bg-white py-16">
@@ -211,7 +243,7 @@ export default async function HomePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Are you a menopause specialist?</h2>
           <p className="text-white/80 text-lg mb-8">
-            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $149/year — and pay for themselves with a single new patient.
+            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $99/year — and pay for themselves with a single new patient.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

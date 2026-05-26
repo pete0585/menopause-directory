@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
-
-const VERIFIED_PRICE_CENTS = 14900 // $149/year
+import { stripe, VERIFIED_PRICE_CENTS, FEATURED_PRICE_CENTS } from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
   try {
-    const { listingId, listingSlug, email } = await request.json()
+    const { listingId, listingSlug, email, tier = 'premium' } = await request.json()
 
     if (!listingId) {
       return NextResponse.json({ error: 'listingId is required' }, { status: 400 })
     }
+
+    const isFeatured = tier === 'featured'
+    const priceAmount = isFeatured ? FEATURED_PRICE_CENTS : VERIFIED_PRICE_CENTS
+    const productName = isFeatured
+      ? 'Featured Listing — MenopauseDirectory.co'
+      : 'Verified Listing — MenopauseDirectory.co'
+    const productDesc = isFeatured
+      ? 'Featured practitioner listing: top placement in city listings (1 of 3 featured spots), verified badge, highlighted card, newsletter mention.'
+      : 'Annual verified practitioner listing: priority placement, verified badge, full profile with direct booking link.'
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://menopausedirectory.co'
 
@@ -21,11 +28,10 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Verified Listing — MenopauseDirectory.co',
-              description:
-                'Annual verified practitioner listing: priority placement, verified badge, full profile with direct booking link.',
+              name: productName,
+              description: productDesc,
             },
-            unit_amount: VERIFIED_PRICE_CENTS,
+            unit_amount: priceAmount,
             recurring: { interval: 'year' },
           },
           quantity: 1,
@@ -41,6 +47,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         listing_id: listingId,
         listing_slug: listingSlug ?? '',
+        tier,
       },
     })
 

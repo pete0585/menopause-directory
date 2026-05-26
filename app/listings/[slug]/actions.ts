@@ -36,6 +36,7 @@ export async function createCheckoutSession(listingId: string, listingSlug: stri
     metadata: {
       listing_id: listingId,
       listing_slug: listingSlug,
+      tier: 'premium',
     },
   })
 

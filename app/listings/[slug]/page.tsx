@@ -320,7 +320,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       className="w-full text-center bg-brand-rose hover:bg-brand-rose-dark text-white text-sm font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       <BadgeCheck size={15} />
-                      Get Verified — $149/year
+                      Get Verified — $99/year
                     </button>
                   </form>
                 </div>

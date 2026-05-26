@@ -58,12 +58,20 @@ export async function POST(req: NextRequest) {
           break
         }
 
+        // Determine tier from metadata (preferred) or amount as fallback
+        const tierFromMetadata = session.metadata?.tier
+        const tier: 'premium' | 'featured' =
+          tierFromMetadata === 'featured' ||
+          (session.amount_total !== null && session.amount_total >= 24900)
+            ? 'featured'
+            : 'premium'
+
         const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
 
         await supabase
           .from('menopause_listings')
           .update({
-            listing_tier: 'premium',
+            listing_tier: tier,
             is_verified: true,
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: session.subscription as string,
@@ -75,9 +83,9 @@ export async function POST(req: NextRequest) {
           listing_id: listingId,
           stripe_payment_intent_id: session.payment_intent as string | null,
           stripe_subscription_id: session.subscription as string,
-          amount_cents: session.amount_total ?? 14900,
+          amount_cents: session.amount_total ?? 9900,
           currency: session.currency ?? 'usd',
-          tier: 'premium',
+          tier,
           status: 'succeeded',
           period_start: new Date().toISOString(),
           period_end: expiresAt,

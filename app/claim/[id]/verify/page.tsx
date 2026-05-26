@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { BadgeCheck, Loader2, ArrowRight } from 'lucide-react'
+import { BadgeCheck, Star, Loader2, ArrowRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+
+type Tier = 'premium' | 'featured'
 
 export default function ClaimVerifyPage() {
   const params = useParams()
@@ -15,13 +17,12 @@ export default function ClaimVerifyPage() {
   const [listingSlug, setListingSlug] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const [error, setError] = useState('')
-  const [upgrading, setUpgrading] = useState(false)
+  const [upgradingTier, setUpgradingTier] = useState<Tier | null>(null)
 
   useEffect(() => {
     async function handleVerify() {
       const supabase = createClient()
 
-      // Exchange PKCE auth code for session
       const code = searchParams.get('code')
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
@@ -32,7 +33,6 @@ export default function ClaimVerifyPage() {
         }
       }
 
-      // Get the authenticated user
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         setError('Could not verify your identity. The link may have expired.')
@@ -42,7 +42,6 @@ export default function ClaimVerifyPage() {
 
       setUserEmail(user.email ?? '')
 
-      // Mark the listing as claimed
       const res = await fetch('/api/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,8 +63,8 @@ export default function ClaimVerifyPage() {
     handleVerify()
   }, [listingId, searchParams])
 
-  async function handleUpgrade() {
-    setUpgrading(true)
+  async function handleUpgrade(tier: Tier) {
+    setUpgradingTier(tier)
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
@@ -74,6 +73,7 @@ export default function ClaimVerifyPage() {
           listingId,
           listingSlug,
           email: userEmail,
+          tier,
         }),
       })
       const data = await res.json()
@@ -85,7 +85,7 @@ export default function ClaimVerifyPage() {
     } catch {
       setError('Failed to start checkout. Please try again.')
     } finally {
-      setUpgrading(false)
+      setUpgradingTier(null)
     }
   }
 
@@ -116,7 +116,7 @@ export default function ClaimVerifyPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-16">
+    <div className="max-w-3xl mx-auto px-4 py-16">
       <div className="text-center mb-10">
         <div className="w-16 h-16 rounded-full bg-brand-sage/15 flex items-center justify-center mx-auto mb-5">
           <BadgeCheck size={32} className="text-brand-sage" />
@@ -127,55 +127,110 @@ export default function ClaimVerifyPage() {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-        <div className="inline-block bg-brand-plum/10 text-brand-plum text-sm font-semibold px-3 py-1 rounded-full mb-4">
-          Verified Specialist — $149/year
+      {/* Two tier cards side by side */}
+      <div className="grid sm:grid-cols-2 gap-5 mb-8">
+        {/* Verified tier */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+          <div className="mb-4">
+            <div className="inline-block bg-brand-plum/10 text-brand-plum text-xs font-semibold px-3 py-1 rounded-full mb-3">
+              Verified — $99/year
+            </div>
+            <h2 className="font-serif text-xl font-bold text-gray-900 mb-1">
+              Get found by more patients
+            </h2>
+            <p className="text-gray-500 text-sm">
+              Priority placement above free listings with a verified badge and full profile.
+            </p>
+          </div>
+          <ul className="space-y-2 mb-6 text-sm text-gray-600 flex-1">
+            {[
+              'Priority placement above unclaimed listings',
+              'Verified badge — patients trust you more',
+              'Full bio, photo, credentials, and specialties',
+              'Direct booking link and contact details',
+              'Telehealth, HRT, and insurance visibility',
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-4 h-4 rounded-full bg-brand-sage/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
+                </div>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => handleUpgrade('premium')}
+            disabled={upgradingTier !== null}
+            className="w-full bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {upgradingTier === 'premium' ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                Upgrade to Verified — $99/year
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
         </div>
-        <h2 className="font-serif text-2xl font-bold text-gray-900 mb-2">
-          Get found by more patients
-        </h2>
-        <p className="text-gray-500 mb-6">
-          Appear at the top of search results with a verified badge, full bio, and direct booking link.
-        </p>
-        <ul className="text-left space-y-2 mb-8 text-sm text-gray-600">
-          {[
-            'Priority placement above unclaimed listings',
-            'Verified badge — patients trust you more',
-            'Full bio, photo, credentials, and specialties',
-            'Direct booking link and contact details',
-            'Telehealth, HRT, and insurance visibility',
-          ].map((item, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-brand-sage/20 flex items-center justify-center flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
-              </div>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <button
-          onClick={handleUpgrade}
-          disabled={upgrading}
-          className="w-full bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-        >
-          {upgrading ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              Upgrade to Verified — $149/year
-              <ArrowRight size={16} />
-            </>
-          )}
-        </button>
+
+        {/* Featured tier */}
+        <div className="bg-brand-plum rounded-2xl p-6 flex flex-col text-white relative overflow-hidden">
+          <div className="absolute top-3 right-3">
+            <span className="bg-brand-rose text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              BEST VALUE
+            </span>
+          </div>
+          <div className="mb-4">
+            <div className="inline-block bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
+              Featured — $249/year
+            </div>
+            <h2 className="font-serif text-xl font-bold text-white mb-1">
+              Top of every search
+            </h2>
+            <p className="text-white/70 text-sm">
+              One of 3 featured spots at the top of city listing pages — maximum visibility.
+            </p>
+          </div>
+          <ul className="space-y-2 mb-6 text-sm text-white/85 flex-1">
+            {[
+              'TOP placement — above all verified and free listings',
+              '1 of only 3 featured spots per city page',
+              'Highlighted card stands out in search results',
+              'Verified badge and full enhanced profile',
+              'Monthly newsletter mention to subscribers',
+              'Priority support and onboarding',
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <Star size={14} className="text-brand-rose flex-shrink-0 mt-0.5" />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => handleUpgrade('featured')}
+            disabled={upgradingTier !== null}
+            className="w-full bg-white text-brand-plum font-semibold py-3 rounded-xl hover:bg-brand-cream transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {upgradingTier === 'featured' ? (
+              <Loader2 size={16} className="animate-spin text-brand-plum" />
+            ) : (
+              <>
+                Get Featured — $249/year
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl text-center">
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl text-center">
           {error}
         </div>
       )}
 
-      <div className="mt-6 text-center">
+      <div className="text-center">
         <a
           href={listingSlug ? `/listings/${listingSlug}` : '/listings'}
           className="text-sm text-gray-400 hover:text-gray-600"

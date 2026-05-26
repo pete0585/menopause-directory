@@ -34,6 +34,8 @@ export function generateMetadata({ searchParams }: PageProps): Metadata {
   }
 }
 
+const TIER_SORT: Record<string, number> = { featured: 0, premium: 1, free: 2, unclaimed: 3 }
+
 async function getListings(filters: PageProps['searchParams']): Promise<Listing[]> {
   const supabase = createClient()
   let query = supabase
@@ -41,10 +43,9 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
     .select('*')
     .eq('is_approved', true)
     .eq('is_active', true)
-    .order('listing_tier', { ascending: false })
     .order('is_verified', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(56)
 
   if (filters.city) {
     query = query.ilike('city', `%${filters.city}%`)
@@ -72,7 +73,12 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
   }
 
   const { data } = await query
-  return (data as Listing[]) ?? []
+  const listings = (data as Listing[]) ?? []
+
+  // Sort: featured → premium → free → unclaimed
+  return listings.sort(
+    (a, b) => (TIER_SORT[a.listing_tier] ?? 4) - (TIER_SORT[b.listing_tier] ?? 4)
+  )
 }
 
 async function getListingsNear(lat: number, lng: number): Promise<Listing[]> {

@@ -220,7 +220,7 @@ export default function SubmitForm() {
       </button>
 
       <p className="text-center text-xs text-gray-400">
-        Free listings are reviewed and approved within 1–2 business days. Upgrade to Verified for $149/year to get a badge, priority placement, and direct booking link.
+        Free listings are reviewed and approved within 1–2 business days. Upgrade to Verified for $99/year to get a badge, priority placement, and direct booking link.
       </p>
     </form>
   )
