@@ -11,6 +11,8 @@ interface PageProps {
   searchParams: {
     city?: string
     state?: string
+    lat?: string
+    lng?: string
     practitioner_type?: string
     mscp_certified?: string
     accepts_telehealth?: string
@@ -73,8 +75,33 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
   return (data as Listing[]) ?? []
 }
 
+async function getListingsNear(lat: number, lng: number): Promise<Listing[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('find_menopause_near', {
+    lat,
+    lng,
+    radius_miles: 25,
+  })
+  if (error || !data) return []
+  return (data as Listing[]).slice(0, 50)
+}
+
 export default async function ListingsPage({ searchParams }: PageProps) {
-  const listings = await getListings(searchParams)
+  let listings = await getListings(searchParams)
+
+  const lat = searchParams.lat ? parseFloat(searchParams.lat) : undefined
+  const lng = searchParams.lng ? parseFloat(searchParams.lng) : undefined
+
+  // Proximity fallback: if a zip lookup provided lat/lng and city search returned nothing,
+  // show menopause specialists within 25 miles
+  let isProximitySearch = false
+  if (listings.length === 0 && lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
+    const nearby = await getListingsNear(lat, lng)
+    if (nearby.length > 0) {
+      listings = nearby
+      isProximitySearch = true
+    }
+  }
 
   const activeType = searchParams.practitioner_type
   const locationLabel = searchParams.city
@@ -106,6 +133,13 @@ export default async function ListingsPage({ searchParams }: PageProps) {
             </span>
           )}
         </p>
+
+        {isProximitySearch && searchParams.city && (
+          <div className="mt-3 rounded-lg bg-purple-50 border border-purple-200 px-4 py-3 text-sm text-purple-700">
+            No specialists found in {searchParams.city} — showing menopause specialists within 25 miles.
+          </div>
+        )}
+
         <div className="mt-4 max-w-2xl">
           <Suspense fallback={null}>
             <SearchBar variant="compact" />
