@@ -84,8 +84,8 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
 async function getListingsNear(lat: number, lng: number): Promise<Listing[]> {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('find_menopause_near', {
-    lat,
-    lng,
+    search_lat: lat,
+    search_lng: lng,
     radius_miles: 25,
   })
   if (error || !data) return []
