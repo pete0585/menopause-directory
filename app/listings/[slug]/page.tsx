@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  MapPin, Phone, Globe, Calendar, BadgeCheck, Wifi,
-  Users, ChevronRight, ArrowRight
+  MapPin, Phone, Globe, BadgeCheck, Wifi,
+  Users, ArrowRight
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PRACTITIONER_TYPE_LABELS, SPECIALTY_LABELS, formatPhone } from '@/lib/utils'
@@ -99,16 +99,16 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-gray-600">Home</Link>
-          <ChevronRight size={14} />
-          <Link href="/listings" className="hover:text-gray-600">Specialists</Link>
-          <ChevronRight size={14} />
-          <Link href={`/listings?city=${listing.city}&state=${listing.state}`} className="hover:text-gray-600">
+        <nav className="mb-6 flex items-center gap-2 text-sm text-gray-400">
+          <Link href="/" className="hover:text-gray-700">Home</Link>
+          <span>/</span>
+          <Link href="/listings" className="hover:text-gray-700">Find a Specialist</Link>
+          <span>/</span>
+          <Link href={`/listings?city=${listing.city}&state=${listing.state}`} className="hover:text-gray-700">
             {listing.city}, {listing.state}
           </Link>
-          <ChevronRight size={14} />
-          <span className="text-gray-600 truncate">{listing.full_name}</span>
+          <span>/</span>
+          <span className="text-gray-700 truncate max-w-[160px]">{listing.full_name}</span>
         </nav>
 
         {upgraded && (
@@ -185,14 +185,14 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
 
               {listing.bio && (
                 <div className="mt-6">
-                  <h2 className="font-semibold text-gray-900 mb-3">About</h2>
+                  <h2 className="font-serif text-lg font-semibold text-gray-900 mb-3">About</h2>
                   <p className="text-gray-600 leading-relaxed whitespace-pre-line">{listing.bio}</p>
                 </div>
               )}
 
               {listing.specialties && listing.specialties.length > 0 && (
                 <div className="mt-6">
-                  <h2 className="font-semibold text-gray-900 mb-3">Specialties</h2>
+                  <h2 className="font-serif text-lg font-semibold text-gray-900 mb-3">Specialties</h2>
                   <div className="flex flex-wrap gap-2">
                     {listing.specialties.map((s) => (
                       <span
@@ -208,7 +208,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
 
               {listing.insurance_accepted && listing.insurance_accepted.length > 0 && (
                 <div className="mt-6">
-                  <h2 className="font-semibold text-gray-900 mb-3">Insurance Accepted</h2>
+                  <h2 className="font-serif text-lg font-semibold text-gray-900 mb-3">Insurance Accepted</h2>
                   <div className="flex flex-wrap gap-2">
                     {listing.insurance_accepted.map((ins) => (
                       <span key={ins} className="text-sm px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-100">
@@ -221,7 +221,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
 
               {listing.languages_spoken && listing.languages_spoken.length > 1 && (
                 <div className="mt-6">
-                  <h2 className="font-semibold text-gray-900 mb-2">Languages Spoken</h2>
+                  <h2 className="font-serif text-lg font-semibold text-gray-900 mb-2">Languages Spoken</h2>
                   <p className="text-gray-600 text-sm">{listing.languages_spoken.join(', ')}</p>
                 </div>
               )}
@@ -320,7 +320,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       className="w-full text-center bg-brand-rose hover:bg-brand-rose-dark text-white text-sm font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       <BadgeCheck size={15} />
-                      Get Verified — $149/year
+                      Get Verified — $49/year
                     </button>
                   </form>
                 </div>
