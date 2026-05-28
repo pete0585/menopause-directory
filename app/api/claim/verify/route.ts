@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   await Promise.all([
     supabase
       .from('menopause_claims')
-      .update({ verified: true })
+      .update({ verified: true, status: 'approved', verified_at: new Date().toISOString() })
       .eq('id', claim.id),
     supabase
       .from('menopause_listings')
