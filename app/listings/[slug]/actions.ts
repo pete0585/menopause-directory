@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { stripe, VERIFIED_PRICE_CENTS } from '@/lib/stripe'
+import { stripe, VERIFIED_PRICE_ID } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 
 export async function createCheckoutSession(listingId: string, listingSlug: string) {
@@ -15,21 +15,11 @@ export async function createCheckoutSession(listingId: string, listingSlug: stri
     mode: 'subscription',
     line_items: [
       {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Verified Listing — MenopauseDirectory.co',
-            description:
-              'Annual verified practitioner listing: priority placement, verified badge, full profile with direct booking link.',
-          },
-          unit_amount: VERIFIED_PRICE_CENTS,
-          recurring: {
-            interval: 'year',
-          },
-        },
+        price: VERIFIED_PRICE_ID,
         quantity: 1,
       },
     ],
+    allow_promotion_codes: true,
     success_url: `${siteUrl}/listings/${listingSlug}?upgraded=1`,
     cancel_url: `${siteUrl}/listings/${listingSlug}`,
     customer_email: user?.email,
