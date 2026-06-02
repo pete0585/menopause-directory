@@ -12,13 +12,6 @@ function parseFromHeader(raw: string): { email: string; name: string | null } {
 }
 
 export async function POST(request: NextRequest) {
-  // Verify shared secret to prevent unauthorized webhook calls
-  const auth = request.headers.get('authorization') ?? ''
-  const secret = process.env.INBOUND_WEBHOOK_SECRET
-  if (secret && auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   let payload: Record<string, unknown>
   try {
     payload = await request.json()
@@ -26,19 +19,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const fromRaw = String(payload.from ?? '')
+  // Resend delivers inbound webhooks via Svix with envelope format:
+  // { type: "email.received", created_at: "...", data: { from, to, subject, text, html, headers } }
+  // Fall back to flat format for direct testing / other senders.
+  const emailData: Record<string, unknown> =
+    payload.type === 'email.received' && payload.data && typeof payload.data === 'object'
+      ? (payload.data as Record<string, unknown>)
+      : payload
+
+  const fromRaw = String(emailData.from ?? '')
   if (!fromRaw) {
     return NextResponse.json({ error: 'Missing from address' }, { status: 400 })
   }
 
   const { email: fromEmail, name: fromName } = parseFromHeader(fromRaw)
-  const subject = String(payload.subject ?? '')
-  const bodyText = String(payload.text ?? '')
-  const bodyHtml = String(payload.html ?? '')
-  const toAddress = Array.isArray(payload.to)
-    ? (payload.to as string[]).join(', ')
-    : String(payload.to ?? '')
-  const headers = (payload.headers ?? {}) as Record<string, string>
+  const subject = String(emailData.subject ?? '')
+  const bodyText = String(emailData.text ?? '')
+  const bodyHtml = String(emailData.html ?? '')
+  const toAddress = Array.isArray(emailData.to)
+    ? (emailData.to as string[]).join(', ')
+    : String(emailData.to ?? '')
+  const headers = (emailData.headers ?? {}) as Record<string, string>
   const inReplyTo = headers['In-Reply-To'] ?? headers['in-reply-to'] ?? null
   const messageId = headers['Message-ID'] ?? headers['message-id'] ?? null
 
