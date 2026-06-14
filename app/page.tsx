@@ -6,6 +6,8 @@ import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
+export const dynamic = "force-dynamic"
+
 const CATEGORIES = [
   {
     slug: 'certified-menopause-practitioner',
