@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </p>
                 <div className="flex items-center gap-4">
                   <span className="text-xs text-gray-400">Related Directories:</span>
-                  <a href="https://ibclcdirectory.com" target="_blank" rel="noopener" className="text-xs text-gray-400 hover:text-white transition-colors">IBCLC Directory</a>
+                  <a href="https://lactationconsultantdirectory.com" target="_blank" rel="noopener" className="text-xs text-gray-400 hover:text-white transition-colors">IBCLC Directory</a>
                 </div>
                 <p className="text-xs text-gray-400">
                   Not affiliated with The Menopause Society.
