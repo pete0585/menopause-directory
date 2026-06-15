@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { BadgeCheck, Mail, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
+import { createClient } from '@supabase/supabase-js'
 
 type Step = 'email' | 'verifying' | 'verified' | 'error'
 
@@ -16,12 +17,30 @@ export default function ClaimPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [listingName, setListingName] = useState('')
+  const [monthlyViews, setMonthlyViews] = useState(0)
 
   useEffect(() => {
-    if (searchParams.get('verified') === 'true') {
+    if (searchParams.get('verified') === 'true' || searchParams.get('upgrade') === 'true') {
       setStep('verified')
     }
   }, [searchParams])
+
+  useEffect(() => {
+    if (step === 'verified' && listingId) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+      supabase
+        .from('listing_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('directory_slug', 'menopause')
+        .eq('listing_id', listingId)
+        .gte('viewed_at', monthStart)
+        .then(({ count }) => setMonthlyViews(count ?? 0))
+    }
+  }, [step, listingId])
 
   async function handleSendClaimLink(e: React.FormEvent) {
     e.preventDefault()
@@ -71,14 +90,36 @@ export default function ClaimPage() {
   if (step === 'verified') {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16">
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
             <CheckCircle size={28} className="text-green-500" />
           </div>
           <h1 className="font-serif text-2xl font-bold text-gray-900 mb-2">Listing claimed!</h1>
-          <p className="text-gray-500">
-            Your listing is live. Upgrade to Verified for priority placement and more visibility.
-          </p>
+        </div>
+
+        <div className='text-center mb-6'>
+          <div className='text-5xl font-bold text-gray-900'>{monthlyViews}</div>
+          <div className='text-gray-500 mt-1'>people viewed your profile this month</div>
+          <div className='mt-3 text-red-600 font-semibold'>
+            0 could contact you — your phone and website are hidden
+          </div>
+        </div>
+
+        <div className='space-y-3 mb-8 text-left'>
+          {[
+            ['Your phone number visible to searchers', 'They can call you directly from your listing'],
+            ['Your website linked', 'Drive traffic to your practice site'],
+            ['Your full bio displayed', 'Build trust before they reach out'],
+            ['Verified badge', 'Stand out from unclaimed profiles'],
+          ].map(([title, sub]) => (
+            <div key={title} className='flex items-start gap-3'>
+              <span className='text-green-500 text-lg leading-tight'>✓</span>
+              <div>
+                <div className='font-medium text-gray-900'>{title}</div>
+                <div className='text-sm text-gray-500'>{sub}</div>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -99,7 +140,7 @@ export default function ClaimPage() {
               <BadgeCheck size={18} className="text-brand-plum" />
               <h2 className="font-semibold text-gray-900">Verified Specialist</h2>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$49<span className="text-base font-normal text-gray-400"> /year</span></p>
+            <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$149<span className="text-base font-normal text-gray-400"> /year</span></p>
             <p className="text-sm text-gray-500 mb-4">Photo, bio, telehealth badge, priority placement.</p>
             <a
               href={`/api/upgrade?listingId=${listingId}&tier=verified`}
@@ -133,7 +174,7 @@ export default function ClaimPage() {
             'Link your website and online booking system',
             'Show your MSCP certification and specialties',
             'Toggle telehealth availability and new patient status',
-            'Upgrade to Verified for priority placement ($49/year)',
+            'Upgrade to Verified for priority placement ($149/year)',
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
               <div className="w-5 h-5 rounded-full bg-brand-sage/15 flex items-center justify-center flex-shrink-0 mt-0.5">

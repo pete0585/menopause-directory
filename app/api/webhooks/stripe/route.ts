@@ -29,6 +29,17 @@ export async function POST(req: NextRequest) {
     { auth: { persistSession: false } }
   )
 
+  // Return 200 for event types we don't handle — prevents Stripe retry loops
+  // from cross-account events (e.g. Substack subscription events hitting directory webhooks)
+  const HANDLED_EVENTS = new Set([
+    'checkout.session.completed',
+    'invoice.payment_succeeded',
+    'customer.subscription.deleted',
+  ])
+  if (!HANDLED_EVENTS.has(event.type)) {
+    return new Response('OK', { status: 200 })
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
