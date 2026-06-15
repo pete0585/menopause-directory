@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/lib/supabase/server'
 import { PRACTITIONER_TYPE_LABELS, SPECIALTY_LABELS, formatPhone } from '@/lib/utils'
 import { createCheckoutSession } from './actions'
+import { ViewTracker } from '@/components/ViewTracker'
 import type { Listing } from '@/lib/types'
 
 interface PageProps {
@@ -58,7 +59,18 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
   const isVerified = listing.listing_tier === 'premium' || listing.listing_tier === 'featured'
   const isFeatured = listing.listing_tier === 'featured'
   const isUnclaimed = listing.listing_tier === 'unclaimed'
+  const isClaimed = listing.listing_tier !== 'unclaimed' && listing.listing_tier != null
   const typeLabel = PRACTITIONER_TYPE_LABELS[listing.practitioner_type] ?? 'Specialist'
+
+  const supabase = createClient()
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+  const { count: viewCount } = await supabase
+    .from('listing_views')
+    .select('*', { count: 'exact', head: true })
+    .eq('directory_slug', 'menopause')
+    .eq('listing_id', String(listing.id))
+    .gte('viewed_at', monthStart)
+  const monthlyViews = viewCount ?? 0
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -96,6 +108,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <ViewTracker listingId={String(listing.id)} directorySlug='menopause' />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
@@ -183,10 +196,24 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                 </div>
               </div>
 
-              {listing.bio && (
+              {isClaimed && listing.bio && (
                 <div className="mt-6">
                   <h2 className="font-serif text-lg font-semibold text-gray-900 mb-3">About</h2>
                   <p className="text-gray-600 leading-relaxed whitespace-pre-line">{listing.bio}</p>
+                </div>
+              )}
+
+              {!isClaimed && (
+                <div className='mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center'>
+                  <p className='text-sm text-gray-500'>
+                    Phone, website, and bio are only visible after this provider claims their listing.
+                  </p>
+                  <a
+                    href={`/claim/${listing.id}`}
+                    className='mt-2 inline-block text-sm font-medium text-blue-600 hover:underline'
+                  >
+                    Is this you? Claim your free profile →
+                  </a>
                 </div>
               )}
 
@@ -247,6 +274,23 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-24">
+              {/* Stats block for claimed listings */}
+              {isClaimed && (
+                <div className='mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4'>
+                  <p className='text-xs font-semibold uppercase tracking-wide text-blue-600'>Profile Activity</p>
+                  <p className='mt-1 text-3xl font-bold text-blue-900'>{monthlyViews}</p>
+                  <p className='text-sm text-blue-700'>people viewed your profile this month</p>
+                  {listing.listing_tier === 'free' && (
+                    <p className='mt-2 text-xs text-blue-600'>
+                      0 could contact you.{' '}
+                      <a href={`/claim/${listing.id}?upgrade=true`} className='underline font-medium'>
+                        Upgrade to be reachable →
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-3 text-sm mb-6">
                 <div className="flex items-start gap-3 text-gray-600">
                   <MapPin size={16} className="flex-shrink-0 text-brand-rose mt-0.5" />
@@ -255,7 +299,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                     {listing.city}, {listing.state} {listing.zip}
                   </span>
                 </div>
-                {listing.phone && (
+                {isClaimed && listing.phone && (
                   <div className="flex items-center gap-3 text-gray-600">
                     <Phone size={16} className="flex-shrink-0 text-brand-rose" />
                     <a href={`tel:${listing.phone}`} className="hover:text-brand-plum transition-colors">
@@ -263,7 +307,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                     </a>
                   </div>
                 )}
-                {listing.website && (
+                {isClaimed && listing.website && (
                   <div className="flex items-center gap-3">
                     <Globe size={16} className="flex-shrink-0 text-brand-rose" />
                     <a
@@ -293,7 +337,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                 >
                   Book a Consultation
                 </a>
-              ) : listing.phone ? (
+              ) : isClaimed && listing.phone ? (
                 <a
                   href={`tel:${listing.phone}`}
                   className="block w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors"
@@ -320,7 +364,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       className="w-full text-center bg-brand-rose hover:bg-brand-rose-dark text-white text-sm font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       <BadgeCheck size={15} />
-                      Get Verified — $49/year
+                      Get Verified — $149/year
                     </button>
                   </form>
                 </div>
