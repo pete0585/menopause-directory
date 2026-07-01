@@ -34,8 +34,24 @@ export async function POST(request: NextRequest) {
 
   const { email: fromEmail, name: fromName } = parseFromHeader(fromRaw)
   const subject = String(emailData.subject ?? '')
-  const bodyText = String(emailData.text ?? '')
-  const bodyHtml = String(emailData.html ?? '')
+
+  // Body extraction — try multiple field names Resend may use
+  const bodyText = String(
+    emailData.text ??
+    emailData.textBody ??
+    emailData.text_body ??
+    emailData.body_text ??
+    (typeof emailData.body === 'string' ? emailData.body : null) ??
+    ''
+  )
+  const bodyHtml = String(
+    emailData.html ??
+    emailData.htmlBody ??
+    emailData.html_body ??
+    emailData.body_html ??
+    ''
+  )
+
   const toAddress = Array.isArray(emailData.to)
     ? (emailData.to as string[]).join(', ')
     : String(emailData.to ?? '')
@@ -44,14 +60,14 @@ export async function POST(request: NextRequest) {
   const messageId = headers['Message-ID'] ?? headers['message-id'] ?? null
 
   // Auto-reply detection: skip OOO / delivery-failure / auto-generated emails
-  const autoReplyPatterns = /out of office|auto.?reply|automatic reply|delivery failed|undeliverable|vacation/i
+  const autoReplyPatterns = /out of office|auto.?reply|automatic reply|delivery (failed|delayed)|undeliverable|mailer.daemon|postmaster|no.reply|noreply|do.not.reply/i
   if (autoReplyPatterns.test(subject) || autoReplyPatterns.test(bodyText.slice(0, 200))) {
     return NextResponse.json({ received: true, skipped: 'auto-reply' })
   }
 
-  const supabase = createServiceClient()
+  const supabase = await createServiceClient()
 
-  // menopause_listings uses email column same as ibclc
+  // Match sender to a listing by email
   const { data: listing } = await supabase
     .from('menopause_listings')
     .select('id, slug')
