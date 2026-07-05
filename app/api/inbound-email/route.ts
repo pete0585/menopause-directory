@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
   const headers = (eventData.headers ?? {}) as Record<string, string>
   const inReplyTo = headers['In-Reply-To'] ?? headers['in-reply-to'] ?? null
   const messageId =
-    headers['Message-ID'] ?? headers['message-id'] ?? String(eventData.message_id ?? '') || null
+    (headers['Message-ID'] ?? headers['message-id'] ?? String(eventData.message_id ?? '')) || null
 
   // Auto-reply detection: skip before body fetch to save API calls
   const autoReplyPatterns =
