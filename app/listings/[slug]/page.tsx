@@ -299,7 +299,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                     {listing.city}, {listing.state} {listing.zip}
                   </span>
                 </div>
-                {isClaimed && listing.phone && (
+                {isVerified && listing.phone && (
                   <div className="flex items-center gap-3 text-gray-600">
                     <Phone size={16} className="flex-shrink-0 text-brand-rose" />
                     <a href={`tel:${listing.phone}`} className="hover:text-brand-plum transition-colors">
@@ -307,7 +307,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                     </a>
                   </div>
                 )}
-                {isClaimed && listing.website && (
+                {isVerified && listing.website && (
                   <div className="flex items-center gap-3">
                     <Globe size={16} className="flex-shrink-0 text-brand-rose" />
                     <a
@@ -317,6 +317,17 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       className="text-brand-plum hover:underline truncate"
                     >
                       {listing.website.replace(/^https?:\/\//, '')}
+                    </a>
+                  </div>
+                )}
+                {isClaimed && !isVerified && (
+                  <div className="rounded-lg border border-brand-plum/20 bg-brand-plum/5 p-3 text-center">
+                    <p className="text-xs font-medium text-brand-plum mb-1">Contact info hidden</p>
+                    <a
+                      href={`/claim/${listing.id}?verified=true`}
+                      className="text-xs font-semibold text-brand-plum hover:underline"
+                    >
+                      Upgrade to show phone &amp; website →
                     </a>
                   </div>
                 )}
@@ -356,7 +367,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
               {!isVerified && !isUnclaimed && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-xs text-gray-500 text-center mb-3">
-                    Are you {listing.full_name}? Upgrade to Verified for priority placement and a booking link.
+                    Are you {listing.full_name}? Upgrade to show your phone and website to every parent who finds you.
                   </p>
                   <form action={createCheckoutSession.bind(null, listing.id, listing.slug)}>
                     <button
@@ -364,7 +375,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                       className="w-full text-center bg-brand-rose hover:bg-brand-rose-dark text-white text-sm font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       <BadgeCheck size={15} />
-                      Get Verified — $149/year
+                      Upgrade to Pro — $29/month
                     </button>
                   </form>
                 </div>

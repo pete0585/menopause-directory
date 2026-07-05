@@ -6,6 +6,7 @@ import { BadgeCheck, Mail, ArrowRight, CheckCircle, Loader2 } from 'lucide-react
 import { createClient } from '@supabase/supabase-js'
 
 type Step = 'email' | 'verifying' | 'verified' | 'error'
+type Billing = 'monthly' | 'annual'
 
 export default function ClaimPage() {
   const params = useParams()
@@ -18,6 +19,7 @@ export default function ClaimPage() {
   const [error, setError] = useState('')
   const [listingName, setListingName] = useState('')
   const [monthlyViews, setMonthlyViews] = useState(0)
+  const [billing, setBilling] = useState<Billing>('monthly')
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true' || searchParams.get('upgrade') === 'true') {
@@ -59,6 +61,27 @@ export default function ClaimPage() {
       setStep('verifying')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleUpgrade(tier: 'pro' | 'verified') {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listingId, tier, billing }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to create checkout session')
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start checkout. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -122,14 +145,51 @@ export default function ClaimPage() {
           ))}
         </div>
 
+        {/* Billing toggle */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex rounded-full border border-gray-200 bg-gray-50 p-1 text-sm">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-4 py-1.5 rounded-full font-medium transition-colors ${
+                billing === 'monthly'
+                  ? 'bg-brand-plum text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBilling('annual')}
+              className={`px-4 py-1.5 rounded-full font-medium transition-colors ${
+                billing === 'annual'
+                  ? 'bg-brand-plum text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Annual <span className="text-xs font-normal opacity-75">save 17%</span>
+            </button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-gray-100 p-6 bg-white shadow-sm">
-            <h2 className="font-semibold text-gray-900 mb-1">Free Listing</h2>
-            <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$0<span className="text-base font-normal text-gray-400"> /forever</span></p>
-            <p className="text-sm text-gray-500 mb-4">Name, credentials, location. Shown in search.</p>
-            <a href="/" className="block text-center border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl text-sm hover:border-brand-plum hover:text-brand-plum transition-colors">
-              Keep free listing
-            </a>
+            <div className="flex items-center gap-2 mb-1">
+              <BadgeCheck size={18} className="text-brand-plum" />
+              <h2 className="font-semibold text-gray-900">Pro Listing</h2>
+            </div>
+            {billing === 'monthly' ? (
+              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$29<span className="text-base font-normal text-gray-400">/month</span></p>
+            ) : (
+              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$290<span className="text-base font-normal text-gray-400">/year</span></p>
+            )}
+            <p className="text-sm text-gray-500 mb-4">Phone, website, and email visible. Photo, bio, priority placement.</p>
+            <button
+              onClick={() => handleUpgrade('pro')}
+              disabled={loading}
+              className="w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 size={16} className="animate-spin" /> : 'Upgrade to Pro'}
+            </button>
           </div>
 
           <div className="rounded-2xl border-2 border-brand-plum p-6 bg-white shadow-sm relative">
@@ -138,17 +198,34 @@ export default function ClaimPage() {
             </div>
             <div className="flex items-center gap-2 mb-1">
               <BadgeCheck size={18} className="text-brand-plum" />
-              <h2 className="font-semibold text-gray-900">Verified Specialist</h2>
+              <h2 className="font-semibold text-gray-900">Verified</h2>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$149<span className="text-base font-normal text-gray-400"> /year</span></p>
-            <p className="text-sm text-gray-500 mb-4">Photo, bio, telehealth badge, priority placement.</p>
-            <a
-              href={`/api/upgrade?listingId=${listingId}&tier=verified`}
-              className="block text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
+            {billing === 'monthly' ? (
+              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$49<span className="text-base font-normal text-gray-400">/month</span></p>
+            ) : (
+              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$490<span className="text-base font-normal text-gray-400">/year</span></p>
+            )}
+            <p className="text-sm text-gray-500 mb-4">Everything in Pro + credential verification, top placement.</p>
+            <button
+              onClick={() => handleUpgrade('verified')}
+              disabled={loading}
+              className="w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              Upgrade to Verified
-            </a>
+              {loading ? <Loader2 size={16} className="animate-spin" /> : 'Get Verified'}
+            </button>
           </div>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-600 text-center">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-6 text-center">
+          <a href="/" className="text-sm text-gray-400 hover:text-gray-600">
+            Skip for now — keep my free listing
+          </a>
         </div>
       </div>
     )

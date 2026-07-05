@@ -5,6 +5,17 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 })
 
-export const VERIFIED_PRICE_CENTS = 14900 // $149/year
-export const FEATURED_PRICE_CENTS = 29900 // $299/year
-export const VERIFIED_PRICE_ID = process.env.STRIPE_VERIFIED_PRICE_ID ?? 'price_1TdcvhGzK9SiblueXA9r9ufP'
+// Tier mapping: premium = Pro ($29/mo), featured = Verified ($49/mo)
+export const PLAN_PRICE_IDS = {
+  premium: {
+    monthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID!,
+    annual: process.env.STRIPE_PRO_ANNUAL_PRICE_ID!,
+  },
+  featured: {
+    monthly: process.env.STRIPE_VERIFIED_MONTHLY_PRICE_ID!,
+    annual: process.env.STRIPE_VERIFIED_ANNUAL_PRICE_ID!,
+  },
+}
+
+// Legacy — still used by actions.ts sidebar CTA
+export const VERIFIED_PRICE_ID = process.env.STRIPE_PRO_MONTHLY_PRICE_ID ?? 'price_1TpxNOGzK9SiblueR0hRmeSo'

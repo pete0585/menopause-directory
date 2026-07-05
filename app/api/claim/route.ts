@@ -45,26 +45,35 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://menopausedirectory.co'
     const claimUrl = `${siteUrl}/api/claim/verify?token=${token}`
 
-    if (process.env.RESEND_API_KEY) {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: process.env.RESEND_FROM_EMAIL ?? 'MenopauseDirectory <hello@mail.menopausedirectory.co>',
-          to: email,
-          subject: `Claim your MenopauseDirectory.co listing: ${displayName}`,
-          html: `
-            <p>Hi there,</p>
-            <p>Click the link below to verify and claim your listing on MenopauseDirectory.co:</p>
-            <p><a href="${claimUrl}" style="color:#7c3aed;font-weight:bold;">Claim my listing →</a></p>
-            <p>This link expires in 72 hours.</p>
-            <p>If you didn't request this, you can safely ignore this email.</p>
-          `,
-        }),
-      })
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured — cannot send verification email')
+      return NextResponse.json({ error: 'Email service not configured. Please contact support.' }, { status: 503 })
+    }
+
+    const emailRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_EMAIL ?? 'Menopause Directory <hello@mail.menopausedirectory.co>',
+        to: email,
+        subject: `Claim your MenopauseDirectory.co listing: ${displayName}`,
+        html: `
+          <p>Hi there,</p>
+          <p>Click the link below to verify and claim your listing on MenopauseDirectory.co:</p>
+          <p><a href="${claimUrl}" style="color:#7c3aed;font-weight:bold;">Claim my listing →</a></p>
+          <p>This link expires in 72 hours.</p>
+          <p>If you didn't request this, you can safely ignore this email.</p>
+        `,
+      }),
+    })
+
+    if (!emailRes.ok) {
+      const emailErr = await emailRes.text()
+      console.error('Resend error:', emailErr)
+      return NextResponse.json({ error: 'Failed to send verification email. Please try again.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, listingName: displayName })

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       .eq('id', claim.id),
     supabase
       .from('menopause_listings')
-      .update({ claimed_at: new Date().toISOString() })
+      .update({ claimed_at: new Date().toISOString(), listing_tier: 'free' })
       .eq('id', claim.listing_id),
   ])
 

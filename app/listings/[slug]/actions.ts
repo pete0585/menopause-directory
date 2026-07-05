@@ -28,6 +28,12 @@ export async function createCheckoutSession(listingId: string, listingSlug: stri
       listing_slug: listingSlug,
       tier: 'premium',
     },
+    subscription_data: {
+      metadata: {
+        listing_id: listingId,
+        tier: 'premium',
+      },
+    },
   })
 
   redirect(session.url!)
