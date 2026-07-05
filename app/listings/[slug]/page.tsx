@@ -348,7 +348,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                 >
                   Book a Consultation
                 </a>
-              ) : isClaimed && listing.phone ? (
+              ) : isVerified && listing.phone ? (
                 <a
                   href={`tel:${listing.phone}`}
                   className="block w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors"
