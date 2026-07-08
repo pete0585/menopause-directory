@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe, VERIFIED_PRICE_CENTS, FEATURED_PRICE_CENTS } from '@/lib/stripe'
+import { stripe, PLAN_PRICE_IDS } from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,13 +10,7 @@ export async function POST(request: NextRequest) {
     }
 
     const isFeatured = tier === 'featured'
-    const priceAmount = isFeatured ? FEATURED_PRICE_CENTS : VERIFIED_PRICE_CENTS
-    const productName = isFeatured
-      ? 'Featured Listing — MenopauseDirectory.co'
-      : 'Verified Listing — MenopauseDirectory.co'
-    const productDesc = isFeatured
-      ? 'Featured practitioner listing: top placement in city listings (1 of 3 featured spots), verified badge, highlighted card, newsletter mention.'
-      : 'Annual verified practitioner listing: priority placement, verified badge, full profile with direct booking link.'
+    const priceId = isFeatured ? PLAN_PRICE_IDS.featured.annual : PLAN_PRICE_IDS.premium.annual
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://menopausedirectory.co'
 
@@ -25,15 +19,7 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: productName,
-              description: productDesc,
-            },
-            unit_amount: priceAmount,
-            recurring: { interval: 'year' },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
