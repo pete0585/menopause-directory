@@ -41,6 +41,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    // Unclaimed listings are noindexed: thin template content, no real bio, high duplication risk.
+    // Claimed listings default to index,follow (undefined = Next.js default).
+    robots: listing.listing_tier === 'unclaimed' ? { index: false, follow: true } : undefined,
     openGraph: {
       title,
       description,
@@ -123,6 +126,23 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
           <span>/</span>
           <span className="text-gray-700 truncate max-w-[160px]">{listing.full_name}</span>
         </nav>
+
+        {isUnclaimed && (
+          <div className="mx-auto mb-6 max-w-2xl rounded-lg border border-yellow-400 bg-yellow-50 px-4 py-3 text-center">
+            <p className="mb-1 font-semibold text-yellow-800">
+              This listing isn&apos;t visible in Google search.
+            </p>
+            <p className="mb-3 text-sm text-yellow-700">
+              Claim your profile to appear when patients search for a menopause specialist in {listing.city}.
+            </p>
+            <a
+              href={`/claim/${listing.id}`}
+              className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              Claim your profile →
+            </a>
+          </div>
+        )}
 
         {upgraded && (
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm mb-6">

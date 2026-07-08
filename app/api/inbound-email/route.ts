@@ -25,7 +25,7 @@ async function fetchEmailBody(
       await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
     }
     try {
-      const { data: email, error } = await resend.emails.receiving.get(emailId)
+      const { data: email, error } = await resend.emails.get(emailId)
       if (error) {
         lastError = `Resend error: ${error.message}`
         continue
