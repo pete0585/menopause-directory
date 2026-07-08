@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('slug, updated_at')
     .eq('is_approved', true)
     .eq('is_active', true)
-    .neq('listing_tier', 'unclaimed')  // Only claimed listings in sitemap — unclaimed are noindexed
+    .not('claimed_at', 'is', null)  // Only genuinely claimed listings — seeded records have claimed_at=null
 
   const listingUrls: MetadataRoute.Sitemap = (listings ?? []).map((l) => ({
     url: `${BASE_URL}/listings/${l.slug}`,
