@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description,
     // Unclaimed listings are noindexed: thin template content, no real bio, high duplication risk.
     // Claimed listings default to index,follow (undefined = Next.js default).
-    robots: listing.listing_tier === 'unclaimed' ? { index: false, follow: true } : undefined,
+    robots: listing.claimed_at ? undefined : { index: false, follow: true },
     openGraph: {
       title,
       description,
@@ -61,8 +61,8 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
 
   const isVerified = listing.listing_tier === 'premium' || listing.listing_tier === 'featured'
   const isFeatured = listing.listing_tier === 'featured'
-  const isUnclaimed = listing.listing_tier === 'unclaimed'
-  const isClaimed = listing.listing_tier !== 'unclaimed' && listing.listing_tier != null
+  const isUnclaimed = !listing.claimed_at
+  const isClaimed = Boolean(listing.claimed_at)
   const typeLabel = PRACTITIONER_TYPE_LABELS[listing.practitioner_type] ?? 'Specialist'
 
   const supabase = createClient()
