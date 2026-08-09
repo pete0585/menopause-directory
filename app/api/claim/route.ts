@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL ?? 'Menopause Directory <hello@mail.menopausedirectory.co>',
+        from: 'Menopause Directory <hello@mail.menopausedirectory.co>',
         to: email,
         subject: `Claim your MenopauseDirectory.co listing: ${displayName}`,
         html: `

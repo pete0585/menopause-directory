@@ -2,5 +2,14 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "menopausedirectory.co" }],
+      "destination": "https://www.menopausedirectory.co/$1",
+      "permanent": true,
+      "statusCode": 308
+    }
+  ]
 }

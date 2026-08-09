@@ -54,11 +54,11 @@ export default function ListingCard({ listing, featured = false }: ListingCardPr
               <div>
                 <h3 className="font-semibold text-gray-900 group-hover:text-brand-plum transition-colors leading-tight">
                   {listing.full_name}
-                  {listing.credentials && (
+                  {listing.credentials && !listing.full_name.includes(listing.credentials) && (
                     <span className="text-gray-500 font-normal">, {listing.credentials}</span>
                   )}
                 </h3>
-                {listing.practice_name && (
+                {listing.practice_name && listing.practice_name !== listing.full_name && (
                   <p className="text-sm text-gray-500 mt-0.5">{listing.practice_name}</p>
                 )}
               </div>
