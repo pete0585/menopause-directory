@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PRACTITIONER_TYPE_LABELS, SPECIALTY_LABELS, formatPhone } from '@/lib/utils'
 import { createCheckoutSession } from './actions'
 import { ViewTracker } from '@/components/ViewTracker'
+import PatientLeadForm from '@/components/PatientLeadForm'
 import type { Listing } from '@/lib/types'
 
 interface PageProps {
@@ -80,8 +81,9 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
     '@type': 'MedicalBusiness',
     name: listing.full_name,
     description: listing.bio ?? undefined,
-    telephone: listing.phone ?? undefined,
-    url: listing.website ?? undefined,
+    telephone: listing.claimed_at ? (listing.phone ?? undefined) : undefined,
+    email: listing.claimed_at ? (listing.email ?? undefined) : undefined,
+    url: listing.claimed_at ? (listing.website ?? undefined) : undefined,
     address: {
       '@type': 'PostalAddress',
       streetAddress: listing.address_line1 ?? undefined,
@@ -179,11 +181,11 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                     <div>
                       <h1 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                         {listing.full_name}
-                        {listing.credentials && (
+                        {listing.credentials && !listing.full_name.includes(listing.credentials) && (
                           <span className="text-gray-400 font-sans font-normal text-xl">, {listing.credentials}</span>
                         )}
                       </h1>
-                      {listing.practice_name && (
+                      {listing.practice_name && listing.practice_name !== listing.full_name && (
                         <p className="text-gray-500 mt-1">{listing.practice_name}</p>
                       )}
                     </div>
@@ -358,6 +360,17 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                   </span>
                 </div>
               </div>
+
+              {isUnclaimed && (
+                <div className="mb-5">
+                  <PatientLeadForm
+                    listingId={String(listing.id)}
+                    providerName={listing.full_name}
+                    city={listing.city}
+                    state={listing.state}
+                  />
+                </div>
+              )}
 
               {listing.booking_url && isVerified ? (
                 <a

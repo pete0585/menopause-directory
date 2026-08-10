@@ -138,7 +138,6 @@ export default async function StatesPage() {
                   <Link
                     href={`/cities#${abbr.toLowerCase()}`}
                     className="hover:text-brand-plum transition-colors"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     {cityCount} {cityCount === 1 ? 'city' : 'cities'}
                   </Link>
