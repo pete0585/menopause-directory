@@ -6,10 +6,9 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "menopausedirectory.co" }],
+      "has": [{ "type": "header", "key": "host", "value": "menopausedirectory.co" }],
       "destination": "https://www.menopausedirectory.co/$1",
-      "permanent": true,
-      "statusCode": 308
+      "permanent": true
     }
   ]
 }
