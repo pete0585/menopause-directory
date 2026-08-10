@@ -12,6 +12,8 @@ const CATEGORY_SLUGS = [
   'telehealth',
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('slug, updated_at')
     .eq('is_approved', true)
     .eq('is_active', true)
-    .not('claimed_at', 'is', null)  // Only genuinely claimed listings — seeded records have claimed_at=null
+    .range(0, 49999)
 
   const listingUrls: MetadataRoute.Sitemap = (listings ?? []).map((l) => ({
     url: `${BASE_URL}/listings/${l.slug}`,
