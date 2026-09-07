@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/salt-lake-city-ut' },
   title: 'Find a Menopause Doctor in Salt Lake City, UT | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in Salt Lake City, Utah. Serving Murray, Sandy, West Jordan, and the greater SLC metro. Telehealth available.',

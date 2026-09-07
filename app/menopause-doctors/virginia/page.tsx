@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/virginia' },
   title: 'Menopause Doctors in Virginia — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers across Virginia. Richmond, Virginia Beach, Charlottesville, Roanoke, and more. Telehealth available statewide.',

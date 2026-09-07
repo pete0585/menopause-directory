@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/phoenix-az' },
   title: 'Menopause Doctors in Phoenix, AZ — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Phoenix and across Arizona. Scottsdale (3 providers), Tucson (4 providers), and more.',

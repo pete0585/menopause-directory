@@ -3,6 +3,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/menopause-doctors/reno-nevada" },
   title: "Best Menopause in Reno, Nevada | Menopause Directory",
   description: "Find menopause in Reno, Nevada. 31+ listed. Filter by city and compare providers.",
 }

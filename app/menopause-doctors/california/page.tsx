@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/california' },
   title: 'Menopause Doctors in California — Find HRT-Friendly Providers | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers across California. 19+ providers listed statewide — Los Angeles, San Francisco, San Diego, Sacramento, and more.',

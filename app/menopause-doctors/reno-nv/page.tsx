@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/reno-nv' },
   title: 'Find a Menopause Doctor in Reno, NV | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in Reno, Nevada. Serving Sparks, Carson City, Fernley, Fallon. Telehealth available.',

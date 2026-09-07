@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/austin-tx' },
   title: 'Menopause Doctors in Austin, TX — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Austin, Texas. 48+ providers listed across the Austin metro. Telehealth options available statewide.',

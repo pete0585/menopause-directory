@@ -3,6 +3,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/menopause-doctors/fresno-ca" },
   title: "Best Menopause in Fresno, CA | Menopause Directory",
   description: "Find menopause in Fresno, California. 45+ listed. Filter by city and compare providers.",
 }

@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/atlanta-ga' },
   title: 'Menopause Doctors in Atlanta, GA — Find HRT-Friendly Providers | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Atlanta, Georgia. 11+ providers listed. Telehealth available statewide.',

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/menopause-doctors/baton-rouge-louisiana" },
   title: "Best Menopause in Baton Rouge, Louisiana | Menopause Directory",
   description: "Find menopause in Baton Rouge, Louisiana. 33+ listed. Filter by city and compare providers.",
 }

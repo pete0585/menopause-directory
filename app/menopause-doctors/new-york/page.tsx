@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/new-york' },
   title: 'Menopause Doctors in New York — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers across New York. 23+ providers statewide — Manhattan, Brooklyn, Buffalo, Rochester, Albany, and more.',

@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/baltimore-md' },
   title: 'Menopause Doctors in Baltimore, MD — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Baltimore, Maryland. 50+ providers listed. Johns Hopkins, UMMC area providers and independent practices.',

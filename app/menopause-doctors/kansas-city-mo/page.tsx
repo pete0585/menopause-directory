@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/kansas-city-mo' },
   title: 'Menopause Doctors in Kansas City, MO — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Kansas City, MO and KS. Providers across the metro including Overland Park and Leawood. Telehealth available.',

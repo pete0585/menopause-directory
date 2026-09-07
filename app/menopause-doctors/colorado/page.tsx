@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/colorado' },
   title: 'Menopause Doctors in Colorado — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers across Colorado. Denver, Colorado Springs, Boulder, Fort Collins, and more. Telehealth available statewide.',

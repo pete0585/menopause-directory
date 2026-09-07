@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/tampa-fl' },
   title: 'Menopause Doctors in Tampa, FL — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Tampa, Florida. 80+ providers listed across the Tampa Bay metro. Telehealth available.',

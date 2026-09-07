@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/minneapolis-mn' },
   title: 'Find a Menopause Doctor in Minneapolis, MN | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in Minneapolis, Minnesota. Serving Saint Paul, Edina, Minnetonka, and the Twin Cities metro. Telehealth available.',

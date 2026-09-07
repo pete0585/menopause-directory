@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/pittsburgh-pa' },
   title: 'Menopause Doctors in Pittsburgh, PA — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Pittsburgh, Pennsylvania. 50+ providers listed. Telehealth available.',

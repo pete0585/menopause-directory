@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/nashville-tn' },
   title: 'Menopause Doctors in Nashville, TN — Find HRT-Friendly Providers | MenopauseDirectory.co',
   description:
     'Find menopause specialists, HRT-prescribing doctors, and MSCP-certified practitioners in Nashville, Tennessee. 9+ providers listed serving the greater Nashville metro.',

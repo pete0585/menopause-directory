@@ -3,6 +3,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/menopause-doctors/el-paso-tx" },
   title: "Best Menopause in El Paso, TX | Menopause Directory",
   description: "Find menopause in El Paso, Texas. 29+ listed. Filter by city and compare providers.",
 }
