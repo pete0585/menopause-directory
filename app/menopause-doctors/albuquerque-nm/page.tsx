@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/albuquerque-nm' },
   title: 'Menopause Doctors in Albuquerque, NM — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Albuquerque, New Mexico. 50+ providers listed. Telehealth options available statewide.',

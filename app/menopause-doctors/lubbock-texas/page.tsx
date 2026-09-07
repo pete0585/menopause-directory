@@ -3,6 +3,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/menopause-doctors/lubbock-texas" },
   title: "Best Menopause in Lubbock, Texas | Menopause Directory",
   description: "Find menopause in Lubbock, Texas. 29+ listed. Filter by city and compare providers.",
 }

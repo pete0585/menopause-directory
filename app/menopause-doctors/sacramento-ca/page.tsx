@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/sacramento-ca' },
   title: 'Find a Menopause Doctor in Sacramento, CA | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in Sacramento, California. Serving Elk Grove, Roseville, Folsom, Davis. Telehealth available.',

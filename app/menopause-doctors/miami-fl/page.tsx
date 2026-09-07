@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/miami-fl' },
   title: 'Find a Menopause Doctor in Miami, FL | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in Miami, Florida. Serving Coral Gables, Brickell, Aventura, Doral. Telehealth available.',

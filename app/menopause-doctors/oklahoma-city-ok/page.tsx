@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/oklahoma-city-ok' },
   title: 'Menopause Doctors in Oklahoma City, OK — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Oklahoma City, Oklahoma. 90+ providers listed. Telehealth options available.',

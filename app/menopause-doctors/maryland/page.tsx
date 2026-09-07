@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/maryland' },
   title: 'Menopause Doctors in Maryland — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers across Maryland. Baltimore, Bethesda, Rockville, Annapolis, and more. Telehealth available statewide.',

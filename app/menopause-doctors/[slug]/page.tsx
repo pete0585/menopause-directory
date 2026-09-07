@@ -5,6 +5,7 @@ import { ArrowRight, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
+import { cityPageUrl } from '@/lib/city-pages'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -59,6 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    alternates: { canonical: cityPageUrl(slug) },
     openGraph: { title, description },
   }
 }

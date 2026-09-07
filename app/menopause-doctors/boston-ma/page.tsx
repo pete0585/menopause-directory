@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/boston-ma' },
   title: 'Menopause Doctors in Boston, MA — Find HRT-Friendly Providers | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Boston, Massachusetts. 11+ providers listed in the Boston metro. Telehealth options available.',

@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/dallas-tx' },
   title: 'Menopause Doctors in Dallas, TX — Find HRT-Friendly Providers | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Dallas, Texas. 3+ providers in Dallas, 7 in Houston. Browse the Texas state hub for all TX providers.',

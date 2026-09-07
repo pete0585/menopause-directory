@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/new-orleans-la' },
   title: 'Find a Menopause Doctor in New Orleans, LA | Menopause Directory',
   description:
     'Find menopause specialists, HRT prescribers, and MSCP-certified practitioners in New Orleans, Louisiana. Serving Metairie, Kenner, Gretna, and the greater NOLA area. Telehealth available.',

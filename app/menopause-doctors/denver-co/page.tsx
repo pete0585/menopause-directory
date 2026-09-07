@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/denver-co' },
   title: 'Menopause Doctors in Denver, CO — HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT-prescribing doctors in Denver, Colorado. 6+ providers listed in Denver metro. Aurora CO also has 6 providers.',

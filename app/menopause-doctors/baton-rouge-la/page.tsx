@@ -6,6 +6,7 @@ import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/menopause-doctors/baton-rouge-la' },
   title: 'Menopause Doctors in Baton Rouge, LA — Find HRT Specialists | MenopauseDirectory.co',
   description:
     'Find menopause specialists, MSCP-certified practitioners, and HRT prescribers in Baton Rouge, Louisiana. 30+ providers listed. Telehealth available.',
