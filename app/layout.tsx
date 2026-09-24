@@ -76,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <ul className="space-y-2.5">
                   <li><Link href="/submit" className="text-sm text-gray-300 hover:text-white transition-colors">List Your Practice</Link></li>
                   <li><Link href="/submit" className="text-sm text-gray-300 hover:text-white transition-colors">Get Listed Free</Link></li>
-                  <li><Link href="/submit#pricing" className="text-sm text-gray-300 hover:text-white transition-colors">Pricing</Link></li>
+                  <li></li>
                   <li><Link href="/admin" className="text-sm text-gray-300 hover:text-white transition-colors">Admin Login</Link></li>
                 </ul>
               </div>
