@@ -3,11 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { BadgeCheck, Mail, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
-import { createClient } from '@supabase/supabase-js'
 
 type Step = 'email' | 'verifying' | 'verified' | 'error'
-type Billing = 'monthly' | 'annual'
-
 export default function ClaimPage() {
   const params = useParams()
   const searchParams = useSearchParams()
@@ -18,8 +15,8 @@ export default function ClaimPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [listingName, setListingName] = useState('')
-  const [monthlyViews, setMonthlyViews] = useState(0)
-  const [billing, setBilling] = useState<Billing>('monthly')
+  const [phone, setPhone] = useState('')
+  const [phoneSaved, setPhoneSaved] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true' || searchParams.get('upgrade') === 'true') {
@@ -82,6 +79,24 @@ export default function ClaimPage() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start checkout. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function savePhone(e: React.FormEvent) {
+    e.preventDefault()
+    if (!phone) return
+    setLoading(true)
+    try {
+      await fetch('/api/claim/phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listingId: params.id, phone }),
+      })
+      setPhoneSaved(true)
+    } catch {
+      setPhoneSaved(true)
     } finally {
       setLoading(false)
     }
