@@ -1,342 +1,46 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { BadgeCheck, Mail, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 
-type Step = 'email' | 'verifying' | 'verified' | 'error'
-export default function ClaimPage() {
-  const params = useParams()
-  const searchParams = useSearchParams()
-  const listingId = params.id as string
-
-  const [step, setStep] = useState<Step>('email')
+function ClaimForm() {
+  const { id } = useParams<{ id: string }>()
+  const token = useSearchParams().get('token')
   const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [listingName, setListingName] = useState('')
   const [phone, setPhone] = useState('')
-  const [phoneSaved, setPhoneSaved] = useState(false)
-
-  useEffect(() => {
-    if (searchParams.get('verified') === 'true' || searchParams.get('upgrade') === 'true') {
-      setStep('verified')
-    }
-  }, [searchParams])
-
-  useEffect(() => {
-    if (step === 'verified' && listingId) {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-      supabase
-        .from('listing_views')
-        .select('*', { count: 'exact', head: true })
-        .eq('directory_slug', 'menopause')
-        .eq('listing_id', listingId)
-        .gte('viewed_at', monthStart)
-        .then(({ count }) => setMonthlyViews(count ?? 0))
-    }
-  }, [step, listingId])
-
-  async function handleSendClaimLink(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
+  const [verified, setVerified] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  async function submit(path: string, body: object, success: string) {
+    setBusy(true); setError(''); setMessage('')
     try {
-      const res = await fetch('/api/claim', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId, email }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed to send claim link')
-      setListingName(data.listingName ?? 'your listing')
-      setStep('verifying')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleUpgrade(tier: 'pro' | 'verified') {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await fetch('/api/upgrade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId, tier, billing }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed to create checkout session')
-      if (data.url) {
-        window.location.href = data.url
+      const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.error || 'The request was not completed.')
+      if (path.endsWith('/verify')) {
+        setVerified(true)
+        window.history.replaceState(null, '', `/claim/${id}`)
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start checkout. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+      setMessage(success)
+    } catch (e) { setError(e instanceof Error ? e.message : 'The request failed. Please retry.') }
+    finally { setBusy(false) }
   }
-
-  async function savePhone(e: React.FormEvent) {
-    e.preventDefault()
-    if (!phone) return
-    setLoading(true)
-    try {
-      await fetch('/api/claim/phone', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId: params.id, phone }),
-      })
-      setPhoneSaved(true)
-    } catch {
-      setPhoneSaved(true)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (step === 'verifying') {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-brand-plum/10 flex items-center justify-center mx-auto mb-6">
-          <Mail size={28} className="text-brand-plum" />
-        </div>
-        <h1 className="font-serif text-2xl font-bold text-gray-900 mb-3">Check your email</h1>
-        <p className="text-gray-500 mb-2">
-          We sent a verification link to <strong>{email}</strong>
-        </p>
-        <p className="text-gray-400 text-sm">
-          Click the link to confirm your identity and claim{listingName ? ` ${listingName}` : ' your listing'}. The link expires in 72 hours.
-        </p>
-        <button
-          onClick={() => setStep('email')}
-          className="mt-8 text-sm text-brand-plum hover:underline"
-        >
-          Use a different email
-        </button>
-      </div>
-    )
-  }
-
-  if (step === 'verified') {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-16">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
-            <CheckCircle size={28} className="text-green-500" />
-          </div>
-          <h1 className="font-serif text-2xl font-bold text-gray-900 mb-2">Listing claimed!</h1>
-        </div>
-
-        <div className='text-center mb-6'>
-          <div className='text-5xl font-bold text-gray-900'>{monthlyViews}</div>
-          <div className='text-gray-500 mt-1'>people viewed your profile this month</div>
-          <div className='mt-3 text-red-600 font-semibold'>
-            0 could contact you — your phone and website are hidden
-          </div>
-        </div>
-
-        <div className='space-y-3 mb-8 text-left'>
-          {[
-            ['Your phone number visible to searchers', 'They can call you directly from your listing'],
-            ['Your website linked', 'Drive traffic to your practice site'],
-            ['Your full bio displayed', 'Build trust before they reach out'],
-            ['Verified badge', 'Stand out from unclaimed profiles'],
-          ].map(([title, sub]) => (
-            <div key={title} className='flex items-start gap-3'>
-              <span className='text-green-500 text-lg leading-tight'>✓</span>
-              <div>
-                <div className='font-medium text-gray-900'>{title}</div>
-                <div className='text-sm text-gray-500'>{sub}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Billing toggle */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex rounded-full border border-gray-200 bg-gray-50 p-1 text-sm">
-            <button
-              onClick={() => setBilling('monthly')}
-              className={`px-4 py-1.5 rounded-full font-medium transition-colors ${
-                billing === 'monthly'
-                  ? 'bg-brand-plum text-white'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBilling('annual')}
-              className={`px-4 py-1.5 rounded-full font-medium transition-colors ${
-                billing === 'annual'
-                  ? 'bg-brand-plum text-white'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Annual <span className="text-xs font-normal opacity-75">save 17%</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-gray-100 p-6 bg-white shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <BadgeCheck size={18} className="text-brand-plum" />
-              <h2 className="font-semibold text-gray-900">Pro Listing</h2>
-            </div>
-            {billing === 'monthly' ? (
-              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$29<span className="text-base font-normal text-gray-400">/month</span></p>
-            ) : (
-              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$290<span className="text-base font-normal text-gray-400">/year</span></p>
-            )}
-            <p className="text-sm text-gray-500 mb-4">Phone, website, and email visible. Photo, bio, priority placement.</p>
-            <button
-              onClick={() => handleUpgrade('pro')}
-              disabled={loading}
-              className="w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : 'Upgrade to Pro'}
-            </button>
-          </div>
-
-          <div className="rounded-2xl border-2 border-brand-plum p-6 bg-white shadow-sm relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-plum text-white text-xs font-semibold px-3 py-1 rounded-full">
-              Most Popular
-            </div>
-            <div className="flex items-center gap-2 mb-1">
-              <BadgeCheck size={18} className="text-brand-plum" />
-              <h2 className="font-semibold text-gray-900">Verified</h2>
-            </div>
-            {billing === 'monthly' ? (
-              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$49<span className="text-base font-normal text-gray-400">/month</span></p>
-            ) : (
-              <p className="text-3xl font-bold text-gray-900 mb-1 font-serif">$490<span className="text-base font-normal text-gray-400">/year</span></p>
-            )}
-            <p className="text-sm text-gray-500 mb-4">Everything in Pro + credential verification, top placement.</p>
-            <button
-              onClick={() => handleUpgrade('verified')}
-              disabled={loading}
-              className="w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : 'Get Verified'}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-600 text-center">
-            {error}
-          </div>
-        )}
-
-        {/* Studio Zero upsell */}
-        <div className="rounded-xl bg-blue-50 border border-blue-200 p-5 mb-6">
-          <h2 className="text-base font-semibold text-blue-900 mb-1">
-            Want to attract more patients?
-          </h2>
-          <p className="text-sm text-blue-700 mb-3">
-            Studio Zero helps healthcare providers grow their practice with AI-powered marketing — content, SEO, and visibility that compounds over time.
-          </p>
-          <a
-            href="https://studiozerohq.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-sm font-medium text-blue-700 underline hover:opacity-80"
-          >
-            Learn more at Studio Zero →
-          </a>
-        </div>
-
-        <div className="mt-6 text-center">
-          <a href="/" className="text-sm text-gray-400 hover:text-gray-600">
-            Skip for now — keep my free listing
-          </a>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="max-w-lg mx-auto px-4 py-16">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-brand-plum/10 flex items-center justify-center mx-auto mb-4">
-          <BadgeCheck size={28} className="text-brand-plum" />
-        </div>
-        <h1 className="font-serif text-3xl font-bold text-gray-900 mb-2">Claim Your Listing</h1>
-        <p className="text-gray-500 leading-relaxed">
-          This listing was added from public NPI data. Claiming it lets you add your bio, photo, website, booking link, and more — completely free.
-        </p>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 mb-4">What you get when you claim</h2>
-        <ul className="space-y-3">
-          {[
-            'Add your bio, photo, and practice description',
-            'Link your website and online booking system',
-            'Show your MSCP certification and specialties',
-            'Toggle telehealth availability and new patient status',
-            'Upgrade to Verified for priority placement ($149/year)',
-          ].map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
-              <div className="w-5 h-5 rounded-full bg-brand-sage/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <div className="w-2 h-2 rounded-full bg-brand-sage" />
-              </div>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <form onSubmit={handleSendClaimLink} className="space-y-4">
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
-        )}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Your professional email address
-          </label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@yourpractice.com"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-plum/30 focus:border-brand-plum text-gray-800"
-          />
-          <p className="text-xs text-gray-400 mt-1.5">
-            We'll send a verification link to this email. Use your practice email for faster verification.
-          </p>
-        </div>
-        <button
-          type="submit"
-          disabled={loading || !email}
-          className="w-full bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              Send Verification Link
-              <ArrowRight size={16} />
-            </>
-          )}
-        </button>
-      </form>
-
-      <p className="text-center text-xs text-gray-400 mt-6">
-        By claiming this listing, you confirm you are the listed practitioner or an authorized representative of the practice.
-      </p>
-    </div>
-  )
+  return <main className="mx-auto max-w-lg px-6 py-16">
+    <h1 className="text-3xl font-bold mb-4">{verified ? 'Manage your listing' : 'Claim your listing'}</h1>
+    <p className="mb-6">Verify the contact email already recorded for your listing. If that email is missing or outdated, contact directory support for an ownership review.</p>
+    {error && <p role="alert" className="rounded border border-red-300 bg-red-50 text-red-900 p-4 mb-4">{error}</p>}
+    {message && <p role="status" className="rounded border border-green-300 bg-green-50 text-green-900 p-4 mb-4">{message}</p>}
+    {verified ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void submit('/api/claim/phone', { listingId: id, phone }, 'Phone number saved and verified.') }}>
+      <label className="block">Public phone number<input className="block w-full border rounded p-3 mt-2" type="tel" required maxLength={40} value={phone} onChange={e => setPhone(e.target.value)} /></label>
+      <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50">{busy ? 'Saving…' : 'Save phone number'}</button>
+    </form> : token ? <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50" onClick={() => void submit('/api/claim/verify', { listingId: id, token }, 'Ownership verified. You can now update your phone number.')}>{busy ? 'Verifying…' : 'Confirm ownership'}</button> : <form className="space-y-4" onSubmit={e => { e.preventDefault(); void submit('/api/claim', { listingId: id, email }, 'Verification email accepted. Check your inbox for the confirmation link.') }}>
+      <label className="block">Listing contact email<input className="block w-full border rounded p-3 mt-2" type="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50">{busy ? 'Requesting…' : 'Send verification email'}</button>
+    </form>}
+    <Link className="block mt-8 underline" href="/">Return to directory</Link>
+  </main>
 }
+
+export default function ClaimPage() { return <Suspense fallback={<p className="p-8">Loading claim…</p>}><ClaimForm /></Suspense> }
