@@ -284,7 +284,7 @@ export default async function HomePage() {
             Are you a menopause specialist?
           </h2>
           <p className="text-white/80 text-lg mb-8 leading-relaxed">
-            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes. Verified listings with priority placement start at $49/year.
+            Thousands of women are actively searching for practitioners like you. A free listing takes 5 minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
