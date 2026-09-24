@@ -107,11 +107,21 @@ export default async function HomePage() {
             <span>{listingCount.toLocaleString()} specialists in our directory — updated daily</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight text-balance mb-6">
-            Find a doctor who{' '}
-            <span className="text-brand-plum italic">actually gets it.</span>
+            Find trusted menopause specialists near you
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-10 text-balance">
-            You've been told it's just aging. Find the menopause specialist who will actually listen — certified practitioners, HRT-prescribing doctors, pelvic floor PTs, and coaches, all in one place.
+            Browse verified menopause specialists by approach, location, and availability — and connect directly. Free, always.
+          </p>
+          <p className="text-sm text-gray-500 mt-4">
+            Are you a menopause specialist?{' '}
+            <a
+              href="https://studiozerohq.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:opacity-80"
+            >
+              List your practice free →
+            </a>
           </p>
           <div className="max-w-3xl mx-auto">
             <Suspense fallback={null}>
