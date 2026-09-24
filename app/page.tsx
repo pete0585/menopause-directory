@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'
+import NewsletterSignup from '@/components/NewsletterSignup'
 
 export const dynamic = "force-dynamic"
 
