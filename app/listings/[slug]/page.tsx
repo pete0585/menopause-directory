@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PRACTITIONER_TYPE_LABELS, SPECIALTY_LABELS, formatPhone } from '@/lib/utils'
-import { createCheckoutSession } from './actions'
 import { ViewTracker } from '@/components/ViewTracker'
 import PatientLeadForm from '@/components/PatientLeadForm'
 import type { Listing } from '@/lib/types'
@@ -397,22 +396,6 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                 </Link>
               )}
 
-              {!isVerified && !isUnclaimed && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500 text-center mb-3">
-                    Are you {listing.full_name}? Upgrade to show your phone and website to every parent who finds you.
-                  </p>
-                  <form action={createCheckoutSession.bind(null, listing.id, listing.slug)}>
-                    <button
-                      type="submit"
-                      className="w-full text-center bg-brand-rose hover:bg-brand-rose-dark text-white text-sm font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
-                    >
-                      <BadgeCheck size={15} />
-                      Upgrade to Pro — $29/month
-                    </button>
-                  </form>
-                </div>
-              )}
 
               {isUnclaimed && (
                 <div className="mt-4 pt-4 border-t border-gray-100 text-center">
@@ -427,7 +410,18 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
             </div>
           </div>
         </div>
+      {/* Studio Zero provider callout */}
+      <div className="mt-8 rounded-xl bg-gray-50 border border-gray-200 p-5">
+        <p className="text-sm text-gray-600">
+          <span className="font-semibold text-gray-800">Are you a provider listed here?</span>{' '}
+          <a href={`/claim/${listing.id}`} className="underline hover:opacity-80">Claim your free listing</a>
+          {' '}to add your contact details and bio.{' '}
+          <a href="https://studiozerohq.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">Studio Zero</a>
+          {' '}helps healthcare providers grow their practice with AI-powered marketing.
+        </p>
+      </div>
       </div>
     </>
   )
 }
+
