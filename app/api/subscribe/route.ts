@@ -1,84 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+
+export const runtime = 'nodejs'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const RESEND_AUDIENCE_ID = process.env.RESEND_MENOPAUSE_AUDIENCE_ID ?? '0fffadeb-d93b-45ff-a6d2-c74504f4089d'
+const NICHE = 'menopause' as const
+const NEWSLETTER_NAME = 'The Change Letter' as const
+const CONFIRM_URL_BASE = 'https://www.menopausedirectorynow.com/newsletter/confirm'
+const DASHBOARD_URL = 'https://aidam.thestrategicveteran.com'
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
+  let email: string, first_name: string | undefined
   try {
-    const body = await request.json()
-    const { email } = body
+    const body = await req.json()
+    email = body.email
+    first_name = body.first_name
+  } catch {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  }
 
-    if (!email || typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
-      return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
-    }
+  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+    return NextResponse.json({ error: 'Valid email address required' }, { status: 400 })
+  }
 
-    const normalizedEmail = email.trim().toLowerCase()
-    const supabase = createServiceClient()
+  const token = process.env.NEWSLETTER_SUBMIT_TOKEN
+  if (!token) {
+    console.error('NEWSLETTER_SUBMIT_TOKEN not configured')
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 })
+  }
 
-    const { error } = await supabase.from('email_subscribers').insert({
-      email: normalizedEmail,
-      directory: 'menopause',
-      source: 'footer-bar',
-    })
-
-    if (error) {
-      // Unique constraint violation = already subscribed — treat as success
-      if (error.code === '23505') {
-        return NextResponse.json({ success: true })
-      }
-      console.error('Subscribe insert error:', error)
-      return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
-    }
-
-    const resendKey = process.env.RESEND_API_KEY
-    if (!resendKey) {
-      console.error('RESEND_API_KEY is not configured')
-      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
-    }
-
-    // Add to Resend audience
-    const audienceRes = await fetch(`https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`, {
+  try {
+    const res = await fetch(`${DASHBOARD_URL}/api/newsletter/submit`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: normalizedEmail, unsubscribed: false }),
-    }).catch((err) => { console.error('Resend audience add error:', err); return null })
-
-    if (!audienceRes || !audienceRes.ok) {
-      console.error('Resend audience add failed', audienceRes?.status)
-      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
-    }
-
-    // Send welcome email
-    const emailRes = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({
-        from: 'hello@menopausedirectory.co',
-        to: normalizedEmail,
-        subject: 'Welcome to the weekly menopause guide',
-        html: `<p>Hi there,</p>
-<p>You're in. Every week: real talk about HRT, finding care, and what actually works for perimenopause and menopause.</p>
-<p>No fluff. No spam. Just the guide you wish you'd had sooner.</p>
-<p>— The MenopauseDirectory.co team</p>
-<p style="font-size:12px;color:#aaa;margin-top:32px;">You signed up at MenopauseDirectory.co. <a href="https://menopausedirectory.co">Visit the directory</a>.</p>`,
+        email: email.trim().toLowerCase(),
+        first_name: first_name?.trim() || undefined,
+        niche: NICHE,
+        newsletter_name: NEWSLETTER_NAME,
+        confirm_url_base: CONFIRM_URL_BASE,
       }),
-    }).catch((err) => { console.error('Resend welcome email error:', err); return null })
-
-    if (!emailRes || !emailRes.ok) {
-      console.error('Resend welcome email failed', emailRes?.status)
-      return NextResponse.json({ error: 'Email service unavailable. Please try again later.' }, { status: 500 })
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      return NextResponse.json({ error: data.error ?? 'Subscription failed' }, { status: res.status })
     }
-
     return NextResponse.json({ success: true })
-  } catch (err) {
-    console.error('Subscribe error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } catch (e) {
+    console.error('Subscribe error:', e)
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 })
   }
 }
