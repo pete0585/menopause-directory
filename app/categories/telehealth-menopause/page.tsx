@@ -23,7 +23,7 @@ async function getTelehealthListings(): Promise<Listing[]> {
     .select('*')
     .eq('is_approved', true)
     .eq('is_active', true)
-    .eq('telehealth_available', true)
+    .eq('accepts_telehealth', true)
     .order('listing_tier', { ascending: false })
     .order('is_verified', { ascending: false })
     .limit(12)

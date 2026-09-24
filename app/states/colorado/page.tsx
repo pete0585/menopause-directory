@@ -198,7 +198,7 @@ export default async function ColoradoMenopausePage() {
                   </p>
                   <p className="text-sm text-gray-400 mt-1">{listing.city}, {listing.state}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {listing.telehealth_available && (
+                    {listing.accepts_telehealth && (
                       <span className="text-xs font-medium text-pink-600 bg-pink-50 rounded-full px-2 py-0.5">
                         Telehealth
                       </span>
