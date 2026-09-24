@@ -1,4 +1,4 @@
-import { createClient } from './supabase/server'
+import { createClient } from './directory-read'
 
 export async function getListingCount(): Promise<number> {
   const supabase = createClient()

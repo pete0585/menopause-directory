@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { BadgeCheck, Wifi, Heart, Leaf, Brain, Activity, ShieldCheck, Search, Star, CheckCircle, ArrowRight } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/directory-read'
 import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import type { Listing } from '@/lib/types'

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Phone, Globe, BadgeCheck, Wifi, Users, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createPublicClient } from '@/lib/directory-read';
 import { PRACTITIONER_TYPE_LABELS, SPECIALTY_LABELS, formatPhone } from '@/lib/utils';
 import { ViewTracker } from '@/components/ViewTracker';
 import PatientLeadForm from '@/components/PatientLeadForm';
@@ -17,13 +18,13 @@ interface PageProps {
     }>;
 }
 async function getListing(slug: string): Promise<Listing | null> {
-    const supabase = createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
         .from('menopause_listings')
         .select('*')
         .eq('slug', slug)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
     return (data as Listing) ?? null;
 }
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/directory-read'
 import ListingCard from '@/components/ListingCard'
 import type { Listing, PractitionerType } from '@/lib/types'
 

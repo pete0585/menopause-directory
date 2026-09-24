@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, MapPin } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/directory-read'
 import type { Listing } from '@/lib/types'
 
 export const metadata: Metadata = {

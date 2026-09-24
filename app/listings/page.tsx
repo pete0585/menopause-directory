@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/directory-read'
 import ListingCard from '@/components/ListingCard'
 import FilterSidebar from '@/components/FilterSidebar'
 import SearchBar from '@/components/SearchBar'
@@ -36,7 +36,7 @@ export function generateMetadata({ searchParams }: PageProps): Metadata {
   }
 }
 
-const TIER_SORT: Record<string, number> = { featured: 0, premium: 1, free: 2, unclaimed: 3 }
+
 
 async function getListings(filters: PageProps['searchParams']): Promise<Listing[]> {
   const supabase = createClient()
@@ -83,10 +83,7 @@ async function getListings(filters: PageProps['searchParams']): Promise<Listing[
   const { data } = await query
   const listings = (data as Listing[]) ?? []
 
-  // Sort: featured → premium → free → unclaimed
-  return listings.sort(
-    (a, b) => (TIER_SORT[a.listing_tier] ?? 4) - (TIER_SORT[b.listing_tier] ?? 4)
-  )
+  return listings
 }
 
 async function getListingsNear(lat: number, lng: number): Promise<Listing[]> {
