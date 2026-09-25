@@ -7,7 +7,7 @@ const NICHE = 'menopause' as const
 const DIRECTORY_SLUG = 'menopause-directory' as const
 const NEWSLETTER_NAME = 'Midlife Signalbook' as const
 const CONFIRM_URL_BASE = 'https://www.menopausedirectory.co/newsletter/confirm'
-const DASHBOARD_URL = 'https://aidam.thestrategicveteran.com'
+const DASHBOARD_URL = 'https://aidam.studiozerohq.com'
 
 export async function POST(req: NextRequest) {
   let email: string, first_name: string | undefined
