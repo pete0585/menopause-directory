@@ -1,1 +1,2 @@
-export {runtime,POST} from '../newsletter/subscribe/route'
+export const runtime = 'nodejs'
+export {POST} from '../newsletter/subscribe/route'
