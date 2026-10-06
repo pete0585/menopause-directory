@@ -7,6 +7,7 @@ const DISMISSED_KEY = 'menopause_footer_dismissed'
 export default function NewsletterFooterBar() {
   const [dismissed, setDismissed] = useState(true) // start hidden to avoid flash
   const [email, setEmail] = useState('')
+  const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function NewsletterFooterBar() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ website, email }),
       })
       if (res.ok) {
         setStatus('success')
@@ -79,6 +80,7 @@ export default function NewsletterFooterBar() {
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+        <div aria-hidden="true" style={{position:"absolute",left:"-10000px",width:1,height:1,overflow:"hidden"}}><label>Website<input name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} /></label></div>
             <input
               type="email"
               required
