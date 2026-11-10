@@ -243,7 +243,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                   </div>)}
                 {listing.website && (<div className="flex items-center gap-3">
                     <Globe size={16} className="flex-shrink-0 text-brand-rose"/>
-                    <a href={listing.website} target="_blank" rel="noopener noreferrer" className="text-brand-plum hover:underline truncate">
+                    <a data-directory-action="website_click" href={listing.website} target="_blank" rel="noopener noreferrer" className="text-brand-plum hover:underline truncate">
                       {listing.website.replace(/^https?:\/\//, '')}
                     </a>
                   </div>)}
@@ -260,7 +260,7 @@ export default async function ListingDetailPage({ params, searchParams }: PagePr
                   <PatientLeadForm listingId={String(listing.id)} providerName={listing.full_name} city={listing.city} state={listing.state}/>
                 </div>)}
 
-              {listing.booking_url ? (<a href={listing.booking_url} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+              {listing.booking_url ? (<a data-directory-action="booking_click" href={listing.booking_url} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors">
                   Book a Consultation
                 </a>) : listing.phone ? (<a href={`tel:${listing.phone}`} className="block w-full text-center bg-brand-plum hover:bg-brand-plum-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors">
                   Call to Schedule
