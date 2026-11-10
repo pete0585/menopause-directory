@@ -1,3 +1,4 @@
+import 'server-only'
 import { createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
@@ -28,9 +29,11 @@ export function createClient() {
 }
 
 export function createServiceClient() {
+  // Privileged clients never inherit a visitor's session or refresh browser auth.
+  // Callers must still authorize the operation and bind it to this directory/listing.
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_KEY!,
-    { auth: { persistSession: false } }
+    { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } }
   )
 }
