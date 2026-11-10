@@ -1,50 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (req.headers.get('origin') !== new URL(req.url).origin) return NextResponse.json({ error: 'Request origin is not allowed' }, { status: 403 })
+  const expectedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase()
+  if (!expectedEmail) return NextResponse.json({ error: 'Administrator identity is not configured' }, { status: 503 })
+  const session = await createClient()
+  const { data: { user }, error: authError } = await session.auth.getUser()
+  if (authError || !user) return NextResponse.json({ error: 'Sign in required' }, { status: 401 })
+  if (!user.email_confirmed_at || user.email?.trim().toLowerCase() !== expectedEmail) return NextResponse.json({ error: 'Administrator access required' }, { status: 403 })
   const { id } = await params
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user || user.user_metadata?.is_admin !== true) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id)) return NextResponse.json({ error: 'Invalid listing' }, { status: 400 })
+  let body: unknown
+  try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid review action' }, { status: 400 })
+  const values = body as Record<string, unknown>
+  if (Object.keys(values).length !== 2 || Object.keys(values).some(key => !['is_approved', 'is_active'].includes(key)) || typeof values.is_approved !== 'boolean' || values.is_active !== values.is_approved) {
+    return NextResponse.json({ error: 'Only an explicit approve or reject review action is allowed' }, { status: 400 })
   }
-
-  let body: Record<string, unknown>
-  try {
-    body = await req.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
-
-  const allowed = ['is_approved', 'is_active', 'is_verified', 'listing_tier']
-  const updates: Record<string, unknown> = {}
-  for (const key of allowed) {
-    if (key in body) updates[key] = body[key]
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
-  }
-
-  const service = createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    { auth: { persistSession: false } }
-  )
-
-  const { error } = await service
-    .from('menopause_listings')
-    .update(updates)
-    .eq('id', id)
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ success: true })
+  const service = await createServiceClient()
+  const { data, error } = await service.from('menopause_listings').update({ is_approved: values.is_approved, is_active: values.is_active }).eq('id', id).select('id,is_approved,is_active').maybeSingle()
+  if (error) return NextResponse.json({ error: 'Review could not be saved' }, { status: 503 })
+  if (!data) return NextResponse.json({ error: 'Listing not found' }, { status: 404 })
+  if (data.id !== id || data.is_approved !== values.is_approved || data.is_active !== values.is_active) return NextResponse.json({ error: 'Review result was not confirmed' }, { status: 409 })
+  return NextResponse.json({ success: true }, { headers: { 'Cache-Control': 'no-store' } })
 }
